@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skyline Quest – Teacher Admin</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root { --bg: #f5f4fb; --ink: #1b1840; --muted: #6b6890; --line: #e2e0f0; --accent: #5b3fd6; --danger: #d6334a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, Segoe UI, sans-serif; }
+    main { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+    h1 { margin: 0 0 4px; font-size: 26px; }
+    p.sub { color: var(--muted); margin: 0 0 22px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    .card h2 { margin: 0 0 10px; font-size: 18px; }
+    input, select, button { font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); }
+    button { background: var(--accent); color: #fff; border: 0; cursor: pointer; }
+    button.danger { background: var(--danger); }
+    button.ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .msg { color: var(--muted); min-height: 22px; }
+    .hidden { display: none; }
+    .wrap { overflow-x: auto; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🏙️ Skyline Quest – Teacher Admin</h1>
+  <p class="sub">Remove inappropriate names, reset leaderboards, and see student progress.</p>
+
+  <div class="card" id="loginCard">
+    <h2>Sign in</h2>
+    <form class="row" id="loginForm">
+      <input type="password" id="key" placeholder="Admin key (ADMIN_KEY)" autocomplete="current-password" required>
+      <button>Unlock</button>
+    </form>
+    <p class="msg" id="loginMsg"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="card">
+      <h2>Reset leaderboard scores</h2>
+      <p class="msg">Players keep their XP, badges and mastered buildings. Only high scores are cleared – handy at the start of a new contest.</p>
+      <div class="row">
+        <select id="resetMode">
+          <option value="">All modes</option>
+          <option value="classic">Classic Tour</option>
+          <option value="blitz">Speed Blitz</option>
+          <option value="survival">Survival</option>
+        </select>
+        <button class="danger" id="resetScores">Reset scores</button>
+        <button class="danger" id="resetAll">Delete EVERYTHING</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content: space-between">
+        <h2>Players (<span id="count">0</span>)</h2>
+        <div class="row"><input id="filter" placeholder="Search names"><button class="ghost" id="refresh">Refresh</button></div>
+      </div>
+      <div class="wrap">
+        <table>
+          <thead><tr><th></th><th>Name</th><th class="num">XP</th><th class="num">Games</th><th class="num">Mastered</th><th class="num">Best Classic</th><th class="num">Best Blitz</th><th class="num">Best Survival</th><th>Last played</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+</main>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let key = sessionStorage.getItem('skyq_admin') || '';
+  let players = [];
+
+  async function api(method, url) {
+    const r = await fetch(url, { method, headers: { 'X-Admin-Key': key } });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  async function load() {
+    try {
+      players = (await api('GET', 'api/admin/players')).players;
+      sessionStorage.setItem('skyq_admin', key);
+      $('#loginCard').classList.add('hidden');
+      $('#panel').classList.remove('hidden');
+      render();
+    } catch (e) {
+      $('#loginMsg').textContent = e.message;
+    }
+  }
+
+  function render() {
+    const f = $('#filter').value.trim().toLowerCase();
+    const list = players.filter((p) => !f || p.name.toLowerCase().includes(f));
+    $('#count').textContent = players.length;
+    $('#rows').innerHTML = list.map((p) => `<tr>
+      <td>${esc(p.avatar)}</td><td>${esc(p.name)}</td><td class="num">${p.xp.toLocaleString()}</td><td class="num">${p.games}</td>
+      <td class="num">${p.mastered}</td><td class="num">${(p.best.classic || 0).toLocaleString()}</td><td class="num">${(p.best.blitz || 0).toLocaleString()}</td>
+      <td class="num">${(p.best.survival || 0).toLocaleString()}</td><td>${p.updated ? new Date(p.updated).toLocaleString() : ''}</td>
+      <td><button class="danger" data-del="${esc(p.key)}">Delete</button></td></tr>`).join('') || '<tr><td colspan="10">No players yet.</td></tr>';
+  }
+
+  $('#loginForm').onsubmit = (e) => { e.preventDefault(); key = $('#key').value; load(); };
+  $('#filter').oninput = render;
+  $('#refresh').onclick = load;
+  $('#rows').onclick = async (e) => {
+    const k = e.target.dataset.del;
+    if (!k || !confirm(`Delete player "${k}" and all of their scores?`)) return;
+    await api('DELETE', 'api/admin/players/' + encodeURIComponent(k));
+    $('#msg').textContent = `Deleted ${k}.`;
+    load();
+  };
+  $('#resetScores').onclick = async () => {
+    const m = $('#resetMode').value;
+    if (!confirm(`Reset ${m || 'ALL'} leaderboard scores? This cannot be undone.`)) return;
+    await api('DELETE', 'api/admin/scores' + (m ? '?mode=' + m : ''));
+    $('#msg').textContent = 'Scores reset.';
+    load();
+  };
+  $('#resetAll').onclick = async () => {
+    if (!confirm('Delete ALL players, progress and scores? This cannot be undone.')) return;
+    if (prompt('Type DELETE to confirm') !== 'DELETE') return;
+    await api('DELETE', 'api/admin/everything');
+    $('#msg').textContent = 'Everything deleted.';
+    load();
+  };
+  if (key) load();
+</script>
+</body>
+</html>
