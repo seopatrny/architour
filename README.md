@@ -31,30 +31,33 @@ Built for 2–5 minute sessions during breaks and passing periods: tap to play, 
 - A teacher page can delete names and reset leaderboards.
 - No accounts, emails or passwords. A first name and last initial (like *Maya R*) is all it stores.
 
-## Run it
+## Deploy to Vercel (recommended)
 
-You need [Node.js](https://nodejs.org) 18 or newer. There are no packages to install.
+1. Import this repo in Vercel. Keep the defaults: there's no build step, and `vercel.json` already tells Vercel to serve `public/` and run the API from `api/index.js`.
+2. **Connect a database.** Vercel can't save files, so the leaderboard lives in Upstash Redis. The free plan is plenty for a school. In your Vercel project, open **Storage → Create Database → Upstash (Redis)** and connect it to the project. This adds the `KV_REST_API_URL` / `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_*`) variables automatically.
+3. **Set a teacher password:** in **Settings → Environment Variables**, add `ADMIN_KEY` with a password of your choice.
+4. **Redeploy** so the new variables take effect (Deployments → ⋯ → Redeploy).
+
+To check it worked, open `https://<your-site>/api/health`. It should say `"ok":true` and `"storage":"upstash"`. If it says `"ok":false`, the message explains what's missing, and the game shows an orange **"Offline mode"** banner until it's fixed.
+
+## Or run it on a school computer
+
+You need [Node.js](https://nodejs.org) 18 or newer. There are no packages to install. Players and scores are saved to a file.
 
 ```bash
 ADMIN_KEY=pick-a-teacher-password npm start
-# → http://localhost:3000
+# → http://localhost:3000  (iPads use http://<this-computer>:3000)
 ```
 
 | Setting | Default | What it does |
 |---|---|---|
-| `PORT` | `3000` | Port to listen on |
 | `ADMIN_KEY` | *(off)* | Password for the teacher page at `/admin.html`. The admin page is off until you set this. |
-| `DATA_DIR` | `./data` | Where `db.json` (players and scores) is saved. Back this file up. |
 | `TIME_ZONE` | `America/Chicago` | Decides when the "Today" leaderboard resets |
+| `PORT` | `3000` | Port to listen on (school-computer mode) |
+| `DATA_DIR` | `./data` | Where `db.json` is saved (school-computer mode). Back this file up. |
+| `UPSTASH_REDIS_REST_URL` + `_TOKEN` | — | Use Upstash Redis instead of a file (set automatically on Vercel) |
 
 Run the tests with `npm test`.
-
-## Put it online for the school
-
-Every iPad has to talk to **the same server** to share one leaderboard. Pick one:
-
-- **A school computer or server:** `npm start` on any machine the iPads can reach, then open `http://<that-computer>:3000`.
-- **A hosting service** (Render, Railway, Fly.io, etc.): start command `npm start`, set `ADMIN_KEY`, and **attach a persistent disk/volume** with `DATA_DIR` pointed at it. Without a persistent disk, the free tiers of these services erase files when they restart, and the leaderboard is lost.
 
 If the iPads can't reach the server, the game still works and an orange banner says **"Offline mode"**. Scores are then saved on that iPad only. The game reconnects by itself when the server is back.
 
@@ -84,7 +87,11 @@ All building data lives in [`public/js/buildings.js`](public/js/buildings.js): n
 ## Project layout
 
 ```
-server.js              no-dependency Node server + leaderboard API
+api/index.js           Vercel serverless function (the leaderboard API)
+lib/app.js             leaderboard API logic (shared by Vercel and local server)
+lib/storage.js         Upstash Redis or a local JSON file
+local/server.js        stand-alone server for a school computer (npm start)
+vercel.json            Vercel settings
 public/index.html      the game
 public/js/game.js      screens, modes, scoring, badges, ranks
 public/js/buildings.js the 34 buildings: facts, clues, drawings
@@ -93,5 +100,5 @@ public/js/store.js     talks to the server (falls back to this-iPad-only)
 public/js/names.js     name rules + word filter (shared with the server)
 public/js/fx.js        sound effects and confetti
 public/admin.html      teacher page
-test/                  server and data tests (npm test)
+test/                  tests (npm test)
 ```

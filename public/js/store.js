@@ -94,6 +94,7 @@
       try {
         const r = await call('GET', 'api/health');
         this.setOnline(r.status === 200 && !!r.data.ok);
+        if (r.data && r.data.error) console.warn('Skyline Quest server:', r.data.error);
       } catch (e) {
         this.setOnline(false);
       }

@@ -2,10 +2,9 @@
   "name": "skyline-quest",
   "version": "1.0.0",
   "description": "A kid-friendly arcade game for learning the buildings of the Chicago River architecture tour skyline.",
-  "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "node server.js",
+    "start": "node local/server.js",
     "test": "node --test test/*.test.js"
   },
   "engines": {
