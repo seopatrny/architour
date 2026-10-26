@@ -40,7 +40,18 @@
     postoffice: ['Old Chicago Main Post Office', 'Old Post Office (Chicago)'],
   };
 
-  const api = { WIKI };
+  // Search words for Wikimedia Commons, used when an article's main photo is missing or is an
+  // inside view, and always for the buildings in PREFER_SEARCH (their article photo was a poor pick).
+  const SEARCH = {
+    aqua: 'Aqua Tower Chicago',
+    opera: 'Civic Opera House Chicago river exterior',
+    unionstation: 'Chicago Union Station exterior Canal Street',
+    amaplaza: '330 North Wabash AMA Plaza Chicago',
+    riverside150: '150 North Riverside Chicago',
+  };
+  const PREFER_SEARCH = ['aqua', 'opera', 'unionstation', 'amaplaza', 'riverside150'];
+
+  const api = { WIKI, SEARCH, PREFER_SEARCH };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.PhotoSources = api;
 })(typeof window !== 'undefined' ? window : globalThis);

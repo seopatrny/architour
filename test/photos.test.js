@@ -24,13 +24,16 @@ function fakeWikimedia() {
       const titles = p.get('titles').split('|');
       if (p.get('prop') === 'images') return json({ query: { pages: [{ title: titles[0], images: [{ title: 'File:Article extra.jpg' }, { title: 'File:Logo.svg' }] }] } });
       // Aqua's article has no usable photo, like the real report
-      return json({ query: { pages: titles.map((t) => (t.startsWith('Aqua') ? { title: t } : { title: t, pageimage: t.replace(/ /g, '_') + '.jpg' })) } });
+      const lead = (t) => ({ 'Civic Opera House': 'Civic_Opera_House_interior.jpg', 'Tribune Tower': 'Tribune_Tower_lobby.jpg' }[t] || t.replace(/ /g, '_') + '.jpg');
+      return json({ query: { pages: titles.map((t) => (t.startsWith('Aqua') ? { title: t } : { title: t, pageimage: lead(t) })) } });
     }
     if (u.hostname === 'commons.wikimedia.org') {
       calls.commons++;
       const width = Number(p.get('iiurlwidth'));
       if (p.get('generator') === 'search') {
-        return json({ query: { pages: [2, 1, 3].map((n) => Object.assign(info(`${p.get('gsrsearch')} ${n}.jpg`, width), { index: n })) } });
+        // the top search hit is an inside shot, which should be skipped
+        const name = (n) => `${p.get('gsrsearch')} ${n === 1 ? 'interior ' : ''}${n}.jpg`;
+        return json({ query: { pages: [2, 1, 3].map((n) => Object.assign(info(name(n), width), { index: n })) } });
       }
       const files = p.get('titles').split('|').map((t) => t.replace(/^File:/, ''));
       return json({ query: { pages: files.map((f) => (f.startsWith('Not on commons') ? { title: 'File:' + f, missing: true } : info(f, width))) } });
@@ -66,8 +69,13 @@ test('serves building photos from our own site, with credits', async (t) => {
   const r = await req('GET', '/api/photos');
   assert.strictEqual(r.status, 200);
   const photos = r.data.photos;
-  assert.strictEqual(Object.keys(photos).length, 33, 'every building except Aqua');
-  assert.ok(!photos.aqua);
+  assert.strictEqual(Object.keys(photos).length, 34, 'every building has a photo');
+  // no article photo → Commons search, skipping the inside shot
+  assert.strictEqual(photos.aqua.file, 'Aqua Tower Chicago 2.jpg');
+  // flagged buildings use the outside-view search instead of the article photo
+  assert.strictEqual(photos.opera.file, 'Civic Opera House Chicago river exterior 2.jpg');
+  // article photo that is an inside view → search instead
+  assert.strictEqual(photos.tribune.file, 'Tribune Tower Chicago 2.jpg');
   assert.match(photos.willis.src, /^api\/photo\/willis\?v=[0-9a-f]{10}$/);
   assert.strictEqual(photos.willis.artist, 'Ada & Co');
   assert.strictEqual(photos.willis.license, 'CC BY-SA 4.0');
@@ -83,7 +91,7 @@ test('serves building photos from our own site, with credits', async (t) => {
   const before = calls.wp;
   await req('GET', '/api/photos');
   assert.strictEqual(calls.wp, before);
-  assert.strictEqual((await req('GET', '/api/photo/aqua')).status, 404);
+  assert.strictEqual((await req('GET', '/api/photo/aqua')).status, 200);
   assert.strictEqual((await req('GET', '/api/photo/nope')).status, 404);
 });
 
@@ -91,9 +99,10 @@ test('teachers can search for and pick a better photo', async (t) => {
   const { req } = await boot(t);
   assert.strictEqual((await req('GET', '/api/admin/photos/aqua/candidates')).status, 403);
   const c = await req('GET', '/api/admin/photos/aqua/candidates', null, true);
-  assert.deepStrictEqual(c.data.candidates.map((x) => x.file), ['Aqua Tower Chicago 1.jpg', 'Aqua Tower Chicago 2.jpg', 'Aqua Tower Chicago 3.jpg', 'Article extra.jpg']);
+  // outside views first, the inside shot last
+  assert.deepStrictEqual(c.data.candidates.map((x) => x.file), ['Aqua Tower Chicago 2.jpg', 'Aqua Tower Chicago 3.jpg', 'Article extra.jpg', 'Aqua Tower Chicago interior 1.jpg']);
   const custom = await req('GET', '/api/admin/photos/aqua/candidates?q=Aqua%20balconies', null, true);
-  assert.strictEqual(custom.data.candidates[0].file, 'Aqua balconies 1.jpg');
+  assert.strictEqual(custom.data.candidates[0].file, 'Aqua balconies 2.jpg');
 
   assert.strictEqual((await req('PUT', '/api/admin/photos/aqua', { file: 'Aqua Tower Chicago 2.jpg' }, true)).status, 200);
   assert.strictEqual((await req('PUT', '/api/admin/photos/opera', { file: 'Not on commons.jpg' }, true)).status, 400);
