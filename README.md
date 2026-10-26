@@ -80,10 +80,10 @@ Go to `/admin.html` and enter your `ADMIN_KEY`. From there you can:
 All building data lives in [`public/js/buildings.js`](public/js/buildings.js): names, years, heights, architects, facts, clues and the drawings.
 
 - **Facts:** written for kids and checked against common sources. Please review them before a big contest and fix anything your class learns differently on the actual tour.
-- **Photos:** the game shows a real photo of each building. It loads them live from each building's Wikipedia article and uses the article's main photo, but only if that photo is freely licensed on Wikimedia Commons. Photos are saved on each iPad for a week. The photographer and license appear on each building card and on the **📷 Photo credits** screen (bottom-right of the title screen), as the free licenses require.
-  - **Different photo:** to swap in another Commons photo for a building, add its file name to `FILE_OVERRIDES` in [`public/js/photos.js`](public/js/photos.js), for example `willis: 'Some Photo Of Willis Tower.jpg'`. Do this if an article's main photo is an interior or a poor angle.
+- **Photos:** each building shows a real photo, by default the main photo from its Wikipedia article, but only if it's freely licensed on Wikimedia Commons. The server fetches each photo and serves it from your own site. Vercel's CDN caches it, so Wikimedia gets one request per photo instead of one per iPad, and school web filters don't block photos. Photos are shown whole, never cropped. The photographer and license appear on each building card and on the **📷 Photo credits** screen (bottom-right of the title screen), as the free licenses require.
+  - **Fix a bad photo:** on the teacher page (`/admin.html`), use **Building photos**. Click **Change photo** on any building to see choices from Wikimedia Commons (search with your own words if needed) and click the one you want. You can also pick **Use the drawing**, or go back to **Use automatic photo**. Every iPad switches within a minute or two.
   - **Your own photo:** save it as `public/img/buildings/<id>.jpg` (for example `willis.jpg`) and add `photo: true` to that building in `buildings.js`.
-  - **Fallbacks:** if a photo can't load (no internet, or the article has no free photo), that building uses its cartoon drawing instead. Mystery Shadow questions always use the drawings, because a silhouette needs a clean outline.
+  - **Fallbacks:** if a photo can't load, that building uses its cartoon drawing. Mystery Shadow questions always use the drawings, because a silhouette needs a clean outline.
 - **Difficulty:** each building has a `tier` (1 = Rookie, 2 = Pro, 3 = Legend). Classic Tour and Survival start with tier 1 and add harder buildings as the game goes on.
 - **Clues** must not contain the building's name. `npm test` checks this for you.
 
@@ -100,6 +100,9 @@ public/js/game.js      screens, modes, scoring, badges, ranks
 public/js/buildings.js the 34 buildings: facts, clues, drawings
 public/js/art.js       small SVG drawing kit used by the drawings
 public/js/store.js     talks to the server (falls back to this-iPad-only)
+public/js/photos.js    loads building photos (from the server, or straight from Wikipedia)
+public/js/photo-sources.js  which Wikipedia article each photo comes from
+lib/photos.js          picks, caches and serves photos; the teacher photo picker
 public/js/names.js     name rules + word filter (shared with the server)
 public/js/fx.js        sound effects and confetti
 public/admin.html      teacher page

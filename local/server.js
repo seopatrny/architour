@@ -30,6 +30,7 @@ function createServer(opts = {}) {
     storageError: opts.store ? undefined : fromEnv.error,
     adminKey: opts.adminKey != null ? opts.adminKey : process.env.ADMIN_KEY || '',
     timeZone: opts.timeZone || process.env.TIME_ZONE || 'America/Chicago',
+    fetchImpl: opts.fetchImpl,
   });
 
   function serveStatic(req, res, url) {

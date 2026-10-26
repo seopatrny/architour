@@ -59,17 +59,28 @@
   const masteredCount = () => BUILDINGS.filter((b) => mastery(b.id) >= MASTERED).length;
   const stars = (n) => [0, 1, 2].map((i) => `<span class="star ${i < n ? 'on' : ''}">★</span>`).join('');
 
-  // Real photo when we have one (the drawing sits underneath as a backup if it fails to load).
+  // Real photo when we have one, shown whole (no cropping) over a blurred copy of itself.
+  // The drawing sits underneath as a backup if the photo can't load.
   // Mystery shadows always use the drawing, since they need a clean outline.
   function pic(b, opts = {}) {
     const drawing = Art.renderBuilding(b, opts);
     if (opts.shadow) return drawing;
     const ph = Photos.get(b.id);
     const src = b.photo ? `img/buildings/${b.id}.jpg` : ph && ph.src;
-    if (!src) return drawing;
-    return `<div class="photo-wrap"><img class="bphoto" src="${esc(src)}" alt="${esc(opts.title || '')}" draggable="false" ` +
-      `onerror="this.parentNode.classList.add('nophoto')">${drawing}</div>`;
+    if (!src) {
+      // photo list still on its way: show the drawing for now and swap it when it arrives
+      return Photos.settled ? drawing : `<div class="photo-pending" data-id="${b.id}" data-title="${esc(opts.title || '')}">${drawing}</div>`;
+    }
+    return `<div class="photo-wrap"><img class="bphoto-bg" src="${esc(src)}" alt="" aria-hidden="true" draggable="false">` +
+      `<img class="bphoto" src="${esc(src)}" alt="${esc(opts.title || '')}" draggable="false" onerror="Photos.retry(this)">${drawing}</div>`;
   }
+
+  Photos.onReady(() => {
+    $$('.photo-pending').forEach((el) => {
+      const b = BY_ID[el.dataset.id];
+      if (b) el.outerHTML = pic(b, { title: el.dataset.title });
+    });
+  });
 
   function credit(b) {
     const ph = !b.photo && Photos.get(b.id);

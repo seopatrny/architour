@@ -1,62 +1,29 @@
-/* Real photos of every building, loaded live from Wikipedia / Wikimedia Commons.
+/* Real photos of every building.
  *
- * For each building we look up its Wikipedia article and use the article's main photo,
- * but only if that photo lives on Wikimedia Commons (so it is freely licensed and we can
- * credit the photographer). Anything that can't load falls back to the drawing.
+ * Normally the game asks its own server (/api/photos). The server picks each building's
+ * photo from Wikimedia Commons (or the one a teacher chose on /admin.html) and serves the
+ * image from our own site, cached by the CDN.
+ * If there's no server (plain static hosting), the game asks Wikipedia directly instead.
+ * Anything that can't load falls back to the drawing.
  *
- * To pick a different photo for a building, put its Commons file name in FILE_OVERRIDES,
- * e.g.  willis: 'Willis Tower From Lake.jpg'
  * To use your own photo instead, save it as public/img/buildings/<id>.jpg and set
  * photo: true on that building in buildings.js. */
 (function (root) {
-  // Wikipedia article titles to try, in order (redirects are followed)
-  const WIKI = {
-    lakepoint: ['Lake Point Tower'],
-    aqua: ['Aqua (skyscraper)', 'Aqua Tower'],
-    stregis: ['St. Regis Chicago', 'Vista Tower'],
-    nbc: ['NBC Tower'],
-    crain: ['Crain Communications Building', 'Smurfit-Stone Building'],
-    aon: ['Aon Center (Chicago)'],
-    twopru: ['Two Prudential Plaza'],
-    hancock: ['875 North Michigan Avenue', 'John Hancock Center'],
-    tribune: ['Tribune Tower'],
-    wrigley: ['Wrigley Building'],
-    london: ['London Guarantee Building'],
-    carbide: ['Carbide & Carbon Building'],
-    jewelers: ['35 East Wacker', 'Jewelers Building'],
-    mather: ['Mather Tower'],
-    trump: ['Trump International Hotel and Tower (Chicago)'],
-    amaplaza: ['AMA Plaza', '330 North Wabash'],
-    marina: ['Marina City'],
-    reidmurdoch: ['Reid, Murdoch & Co. Building', 'Reid Murdoch Building'],
-    leoburnett: ['Leo Burnett Building'],
-    wacker333: ['333 Wacker Drive'],
-    mart: ['Merchandise Mart'],
-    salesforce: ['Salesforce Tower Chicago', 'Wolf Point (Chicago)'],
-    riverpoint: ['River Point'],
-    riverside150: ['150 North Riverside'],
-    bofa110: ['110 North Wacker'],
-    boeing: ['100 North Riverside', 'Boeing International Headquarters'],
-    opera: ['Civic Opera House'],
-    dailynews: ['Chicago Daily News Building', 'Riverside Plaza (Chicago)'],
-    boardoftrade: ['Chicago Board of Trade Building'],
-    willis: ['Willis Tower'],
-    unionstation: ['Chicago Union Station'],
-    franklin: ['Franklin Center (Chicago)'],
-    wacker311: ['311 South Wacker Drive'],
-    postoffice: ['Old Chicago Main Post Office', 'Old Post Office (Chicago)'],
-  };
+  const WIKI = (root.PhotoSources || {}).WIKI || {};
 
-  // Commons file names that replace the article's main photo
+  // Commons file names that replace the article's main photo (direct-from-Wikipedia mode only;
+  // with a server, teachers pick photos on /admin.html instead)
   const FILE_OVERRIDES = {};
 
   const CACHE_KEY = 'skyq_photos_v1';
+  const SERVER_CACHE_KEY = 'skyq_photos_srv';
   const CACHE_DAYS = 7;
   const WIDTH = 960; // a standard Wikimedia thumbnail size, sharp on iPad screens
   const WP = 'https://en.wikipedia.org/w/api.php';
   const COMMONS = 'https://commons.wikimedia.org/w/api.php';
 
-  const Photos = { map: {}, ready: null };
+  const Photos = { map: {}, ready: null, settled: false };
+  const waiting = [];
 
   const stripHtml = (s) => {
     const d = document.createElement('div');
@@ -148,22 +115,61 @@
     return null;
   }
 
-  Photos.load = function () {
+  const lsGet = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage full */ } };
+
+  async function fromServer() {
+    const res = await fetch('api/photos', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || typeof data.photos !== 'object') throw new Error('no photos');
+    lsSet(SERVER_CACHE_KEY, data.photos);
+    return data.photos;
+  }
+
+  async function fromWikipedia() {
     const cached = readCache();
-    if (cached) Photos.map = cached;
-    Photos.ready = (cached ? Promise.resolve(cached) : fetchAll().then((map) => {
-      Photos.map = map;
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), map })); } catch (e) { /* storage full */ }
-      return map;
-    })).then((map) => {
-      // warm the browser cache so questions don't flash while photos download
-      Object.values(map).forEach((p) => { const img = new Image(); img.src = p.src; });
-      return map;
-    }).catch((e) => {
-      console.warn('Skyline Quest: could not load building photos, using drawings instead.', e);
-      return {};
-    });
+    if (cached) return cached;
+    const map = await fetchAll();
+    lsSet(CACHE_KEY, { ts: Date.now(), map });
+    return map;
+  }
+
+  // download photos one at a time so we never fire dozens of requests at once
+  async function preload(map) {
+    for (const p of Object.values(map)) {
+      await new Promise((done) => { const img = new Image(); img.onload = img.onerror = done; img.src = p.src; });
+    }
+  }
+
+  Photos.load = function () {
+    const lastServer = lsGet(SERVER_CACHE_KEY);
+    if (lastServer) Photos.map = lastServer;
+    Photos.ready = fromServer()
+      .catch(() => lastServer || fromWikipedia())
+      .catch((e) => {
+        console.warn('Skyline Quest: could not load building photos, using drawings instead.', e);
+        return {};
+      })
+      .then((map) => {
+        Photos.map = map;
+        Photos.settled = true;
+        waiting.splice(0).forEach((fn) => fn(map));
+        preload(map);
+        return map;
+      });
     return Photos.ready;
+  };
+
+  // run fn once the photo list has arrived (immediately if it already has)
+  Photos.onReady = (fn) => (Photos.settled ? fn(Photos.map) : waiting.push(fn));
+
+  // an <img> failed: try once more a moment later, otherwise show the drawing
+  Photos.retry = (img) => {
+    const wrap = img.closest('.photo-wrap');
+    if (img.dataset.retried) { if (wrap) wrap.classList.add('nophoto'); return; }
+    img.dataset.retried = '1';
+    setTimeout(() => { img.src = img.src + (img.src.includes('?') ? '&' : '?') + 'retry=1'; }, 1500);
   };
 
   Photos.get = (id) => Photos.map[id] || null;
