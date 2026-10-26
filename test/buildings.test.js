@@ -35,3 +35,12 @@ test('every illustration renders as clean SVG', () => {
     }
   }
 });
+
+test('every building has Wikipedia articles to pull a real photo from', () => {
+  global.window = {};
+  require('../public/js/photos.js');
+  const { WIKI } = global.window.Photos;
+  delete global.window;
+  assert.deepStrictEqual(Object.keys(WIKI).sort(), BUILDINGS.map((b) => b.id).sort());
+  for (const [id, titles] of Object.entries(WIKI)) assert.ok(titles.length && titles.every((t) => typeof t === 'string' && t.length > 2), id);
+});

@@ -1,7 +1,7 @@
 /* Keeps the game working if the school Wi-Fi blips: network first, cached copy as backup.
  * Leaderboard calls (/api/) are never cached. */
-const CACHE = 'skyline-quest-v2';
-const CORE = ['./', 'index.html', 'css/style.css', 'js/names.js', 'js/art.js', 'js/buildings.js', 'js/store.js', 'js/fx.js', 'js/game.js', 'img/icon.svg', 'manifest.webmanifest'];
+const CACHE = 'skyline-quest-v3';
+const CORE = ['./', 'index.html', 'css/style.css', 'js/names.js', 'js/art.js', 'js/buildings.js', 'js/store.js', 'js/fx.js', 'js/photos.js', 'js/game.js', 'img/icon.svg', 'manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -17,7 +17,10 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((res) => {
-        if (res.ok && (url.origin === location.origin || url.hostname.endsWith('gstatic.com') || url.hostname.endsWith('googleapis.com'))) {
+        const sameOrFonts = url.origin === location.origin || url.hostname.endsWith('gstatic.com') || url.hostname.endsWith('googleapis.com');
+        // building photos from Wikimedia arrive as opaque (no-cors) image responses
+        const photo = url.hostname === 'upload.wikimedia.org' && (res.ok || res.type === 'opaque');
+        if ((res.ok && sameOrFonts) || photo) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }

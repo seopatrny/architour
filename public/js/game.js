@@ -59,9 +59,31 @@
   const masteredCount = () => BUILDINGS.filter((b) => mastery(b.id) >= MASTERED).length;
   const stars = (n) => [0, 1, 2].map((i) => `<span class="star ${i < n ? 'on' : ''}">★</span>`).join('');
 
+  // Real photo when we have one (the drawing sits underneath as a backup if it fails to load).
+  // Mystery shadows always use the drawing, since they need a clean outline.
   function pic(b, opts = {}) {
-    if (b.photo && !opts.shadow) return `<img class="bphoto" src="img/buildings/${b.id}.jpg" alt="">`;
-    return Art.renderBuilding(b, opts);
+    const drawing = Art.renderBuilding(b, opts);
+    if (opts.shadow) return drawing;
+    const ph = Photos.get(b.id);
+    const src = b.photo ? `img/buildings/${b.id}.jpg` : ph && ph.src;
+    if (!src) return drawing;
+    return `<div class="photo-wrap"><img class="bphoto" src="${esc(src)}" alt="${esc(opts.title || '')}" draggable="false" ` +
+      `onerror="this.parentNode.classList.add('nophoto')">${drawing}</div>`;
+  }
+
+  function credit(b) {
+    const ph = !b.photo && Photos.get(b.id);
+    if (!ph) return '';
+    return `<div class="credit">📷 ${esc(ph.artist)} · ${esc(ph.license)} · Wikimedia Commons</div>`;
+  }
+
+  function showCredits() {
+    const rows = BUILDINGS.map((b) => [b, !b.photo && Photos.get(b.id)]).filter(([, ph]) => ph);
+    modal(`<button class="x" data-close>✖</button><h3>📷 Photo credits</h3>
+      <p class="credits-intro">Building photos come from Wikimedia Commons and are used under their free licenses. Thank you, photographers!</p>
+      ${rows.length ? `<ul class="credits">${rows.map(([b, ph]) => `<li><b>${esc(b.name)}</b> – ${esc(ph.artist)}, <i>${esc(ph.license)}</i>
+        <small>${esc(ph.filePage || ph.file)}${ph.licenseUrl ? ` · ${esc(ph.licenseUrl)}` : ''}</small></li>`).join('')}</ul>`
+        : '<p>Photos haven\'t loaded yet, so the game is showing drawings.</p>'}`, 'card-modal');
   }
 
   function show(id, html) {
@@ -120,8 +142,10 @@
         <button class="btn huge yellow pulse" id="startBtn">▶ TAP TO PLAY</button>
         <div class="ticker" id="ticker"></div>
       </div>
+      <button class="credits-btn" id="creditsBtn">📷 Photo credits</button>
       <div class="title-sky">${sky}<div class="boat">🚤</div><div class="water"></div></div>`);
     $('#s-title').onclick = () => { Sfx.unlock(); Sfx.play('start'); showLogin(); };
+    $('#creditsBtn').onclick = (e) => { e.stopPropagation(); showCredits(); };
     loadTicker();
   }
 
@@ -704,6 +728,7 @@
           <div class="spot"><b>👀 How to spot it:</b> ${esc(b.spot)}</div>
           <ul class="facts">${b.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
           <div class="mastery">Mastery: ${stars(Math.min(MASTERED, m))} ${m >= MASTERED ? '<b class="gold-txt">MASTERED!</b>' : `<small>${MASTERED - m} more to master</small>`}</div>
+          ${credit(b)}
         </div>
       </div>`, 'card-modal');
     // refresh "???" names once a card has been viewed
@@ -774,6 +799,7 @@
   Store.onStatus = (online) => $('#offline').classList.toggle('hidden', online);
   Sfx.muted = !!Store.pref('muted');
   Store.init();
+  Photos.load();
   showTitle();
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});

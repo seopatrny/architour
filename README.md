@@ -80,7 +80,10 @@ Go to `/admin.html` and enter your `ADMIN_KEY`. From there you can:
 All building data lives in [`public/js/buildings.js`](public/js/buildings.js): names, years, heights, architects, facts, clues and the drawings.
 
 - **Facts:** written for kids and checked against common sources. Please review them before a big contest and fix anything your class learns differently on the actual tour.
-- **Real photos:** every building is drawn as a cartoon illustration, so the game works with no internet and no image licensing. To show a real photo instead, save it as `public/img/buildings/<id>.jpg` (for example `willis.jpg`) and add `photo: true` to that building. Silhouette questions still use the drawing.
+- **Photos:** the game shows a real photo of each building. It loads them live from each building's Wikipedia article and uses the article's main photo, but only if that photo is freely licensed on Wikimedia Commons. Photos are saved on each iPad for a week. The photographer and license appear on each building card and on the **📷 Photo credits** screen (bottom-right of the title screen), as the free licenses require.
+  - **Different photo:** to swap in another Commons photo for a building, add its file name to `FILE_OVERRIDES` in [`public/js/photos.js`](public/js/photos.js), for example `willis: 'Some Photo Of Willis Tower.jpg'`. Do this if an article's main photo is an interior or a poor angle.
+  - **Your own photo:** save it as `public/img/buildings/<id>.jpg` (for example `willis.jpg`) and add `photo: true` to that building in `buildings.js`.
+  - **Fallbacks:** if a photo can't load (no internet, or the article has no free photo), that building uses its cartoon drawing instead. Mystery Shadow questions always use the drawings, because a silhouette needs a clean outline.
 - **Difficulty:** each building has a `tier` (1 = Rookie, 2 = Pro, 3 = Legend). Classic Tour and Survival start with tier 1 and add harder buildings as the game goes on.
 - **Clues** must not contain the building's name. `npm test` checks this for you.
 
