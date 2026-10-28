@@ -118,3 +118,9 @@ test('teachers can search for and pick a better photo', async (t) => {
   photos = (await req('GET', '/api/photos')).data.photos;
   assert.strictEqual(photos.willis.file, 'Willis Tower.jpg', 'back to automatic');
 });
+
+test('a crowd of iPads opening at once shares one Wikimedia lookup', async (t) => {
+  const { req, calls } = await boot(t);
+  await Promise.all(Array.from({ length: 30 }, () => req('GET', '/api/photos')));
+  assert.strictEqual(calls.wp, 1, 'one batched Wikipedia request, not 30');
+});

@@ -65,6 +65,11 @@
           .map((p) => ({ key: p.key, name: p.name, avatar: p.avatar, score: Object.values(p.mastery).filter((v) => v >= 3).length, xp: p.xp }))
           .filter((r) => r.score > 0 || r.xp > 0).sort((a, b) => b.score - a.score || b.xp - a.xp).slice(0, limit);
       }
+      if (mode === 'combined') {
+        const total = new Map();
+        for (const m of MODES) for (const r of this.leaderboard(m, range, 100000)) total.set(r.key, Object.assign({}, r, { score: (total.has(r.key) ? total.get(r.key).score : 0) + r.score }));
+        return [...total.values()].sort((a, b) => b.score - a.score).slice(0, limit);
+      }
       const now = Date.now(), today = new Date().toDateString(), best = new Map();
       for (const s of db.scores) {
         if (s.mode !== mode) continue;
@@ -156,12 +161,12 @@
       });
     },
 
-    leaderboard(mode, range) {
+    leaderboard(mode, range, limit = 20) {
       return this.withFallback(async () => {
-        const r = await call('GET', `api/leaderboard?mode=${mode}&range=${range}`);
+        const r = await call('GET', `api/leaderboard?mode=${mode}&range=${range}&limit=${limit}`);
         if (r.status !== 200) throw new Error('server');
         return r.data.rows;
-      }, () => Local.leaderboard(mode, range));
+      }, () => Local.leaderboard(mode, range, limit));
     },
 
     recent() { return ls.get(RECENT, []); },

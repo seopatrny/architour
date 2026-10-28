@@ -1,0 +1,81 @@
+/* Skyline Leaderboard (shared by the game and the classroom display) */
+.skyboard {
+  position: relative; overflow: hidden; border-radius: inherit;
+  background: linear-gradient(#070720 0%, #1b1352 38%, #4a2380 66%, #ff7a59 92%, #ffb36b 100%);
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif; font-weight: 600; color: #fff;
+  -webkit-user-select: none; user-select: none;
+}
+.sb-stars {
+  position: absolute; inset: 0 0 45% 0; opacity: 0.85; pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 8% 18%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 22% 9%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 37% 26%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 51% 6%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 63% 19%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 78% 11%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 91% 24%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 15% 36%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 70% 34%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 44% 15%, #fff 50%, transparent 51%);
+  animation: sbTwinkle 2.6s ease-in-out infinite alternate;
+}
+@keyframes sbTwinkle { to { opacity: 0.4; } }
+.sb-moon { position: absolute; top: 24%; left: 6%; width: 7vmin; height: 7vmin; border-radius: 50%; background: #fff6d6; box-shadow: 0 0 40px 10px rgba(255, 240, 190, 0.35); }
+
+/* searchlights from the champion's roof */
+.sb-beams { position: absolute; width: 0; height: 0; z-index: 1; pointer-events: none; animation: sbFade 0.8s ease-out both; }
+.sb-beam {
+  position: absolute; left: -6vmin; bottom: 0; width: 12vmin; height: 150vh; transform-origin: 50% 100%;
+  background: linear-gradient(to top, rgba(255, 236, 160, 0.55), rgba(255, 236, 160, 0));
+  clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0); filter: blur(2px);
+}
+.sb-beam.a { animation: sbSweepA 7s ease-in-out infinite alternate; }
+.sb-beam.b { animation: sbSweepB 8s ease-in-out infinite alternate; }
+@keyframes sbSweepA { from { transform: rotate(-35deg); } to { transform: rotate(12deg); } }
+@keyframes sbSweepB { from { transform: rotate(30deg); } to { transform: rotate(-10deg); } }
+@keyframes sbFade { from { opacity: 0; } }
+
+.sb-city { position: absolute; inset: 0; z-index: 2; }
+.sb-slot { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.sb-tower { position: relative; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+.sb-tower svg { display: block; filter: brightness(0.62) saturate(1.15); }
+.sb-tower.rise svg { animation: sbRise 1s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; animation-delay: inherit; }
+@keyframes sbRise { from { transform: translateY(102%); } }
+.r1 .sb-tower svg { filter: brightness(0.85) saturate(1.2) drop-shadow(0 0 14px rgba(255, 210, 63, 0.9)); }
+.r2 .sb-tower svg { filter: brightness(0.75) drop-shadow(0 0 10px rgba(220, 230, 255, 0.85)); }
+.r3 .sb-tower svg { filter: brightness(0.72) drop-shadow(0 0 10px rgba(255, 160, 90, 0.85)); }
+.empty .sb-tower svg { filter: brightness(0.3) saturate(0.4); }
+
+/* player sign above each roof */
+.sb-label {
+  position: absolute; left: 3%; right: 3%; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 0.35em 0.2em 0.4em; border-radius: 0.8em; background: rgba(12, 10, 40, 0.72); border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0.3em 0.9em rgba(0, 0, 0, 0.45); line-height: 1.1; z-index: 3;
+}
+.sb-label::after { content: ''; position: absolute; bottom: -8px; left: 50%; margin-left: -6px; border: 6px solid transparent; border-top-color: rgba(255, 255, 255, 0.35); border-bottom: 0; }
+.sb-label.pop { animation: sbPop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes sbPop { from { transform: translateY(20px) scale(0.4); opacity: 0; } }
+.sb-rank { font-family: 'Lilita One', 'Arial Rounded MT Bold', sans-serif; font-weight: 400; font-size: 0.95em; color: #cfc8ff; letter-spacing: 0.5px; }
+.sb-av { font-size: 2em; line-height: 1.15; }
+.sb-name { font-family: 'Lilita One', 'Arial Rounded MT Bold', sans-serif; font-weight: 400; font-size: 1.05em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-score { font-size: 0.9em; color: #ffd23f; }
+.sb-claim { font-size: 0.85em; color: #b9b4e8; padding: 0.4em 0; }
+.empty .sb-label { background: rgba(12, 10, 40, 0.35); border-style: dashed; }
+.r1 .sb-label { border-color: #ffd23f; background: linear-gradient(160deg, rgba(255, 210, 63, 0.45), rgba(12, 10, 40, 0.8)); box-shadow: 0 0 24px rgba(255, 210, 63, 0.6); }
+.r1 .sb-rank { color: #ffd23f; }
+.r1 .sb-av { animation: sbBob 1.8s ease-in-out infinite; }
+.r2 .sb-label { border-color: #dfe6f3; }
+.r3 .sb-label { border-color: #ff9f43; }
+.me .sb-label { border-color: #38d9ff; box-shadow: 0 0 18px rgba(56, 217, 255, 0.8); }
+.me .sb-rank::after { content: ' · YOU'; color: #38d9ff; }
+.sb-up { color: #3ddc84; font-size: 0.9em; }
+.sb-label.up { animation: sbPop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both, sbGlow 1.2s ease-in-out 3; }
+@keyframes sbGlow { 50% { box-shadow: 0 0 26px rgba(61, 220, 132, 0.9); } }
+@keyframes sbBob { 50% { transform: translateY(-4px) rotate(-6deg); } }
+
+/* river with the real building names */
+.sb-river { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: linear-gradient(#1d5c8f, #0b2746); border-top: 3px solid #5d6b75; }
+.sb-names { position: relative; height: 100%; }
+.sb-cap { position: absolute; top: 6px; text-align: center; color: #cfe9ff; line-height: 1.1; padding: 0 2px; opacity: 0.9; }
+.sb-boat { position: absolute; bottom: 2px; font-size: 26px; transform: scaleX(-1); animation: sbSail 22s linear infinite; }
+@keyframes sbSail { from { left: -60px; } to { left: 105%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skyboard *, .skyboard { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

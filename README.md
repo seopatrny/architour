@@ -12,6 +12,7 @@ Built for 2–5 minute sessions during breaks and passing periods: tap to play, 
 | ⚡ **Speed Blitz** | 60 seconds. Answer as many as you can. Wrong answers cost 3 seconds. |
 | 💀 **Survival** | One miss and you're out. The timer gets shorter every level. |
 | 📚 **Skyline Dex** | A collectible card for every building: year, height, architect, "how to spot it" and fun facts. Cards turn **gold** when mastered. |
+| 🌆 **Skyline Leaderboard** | The top players *become* the Chicago skyline. #1 gets Willis Tower, #2 Trump Tower, #3 St. Regis, and so on, each drawn to its real height. It uses a combined score: each student's best Classic + best Blitz + best Survival. It's the first tab on the Leaderboard screen. |
 | 🏆 **Leaderboards** | Today, This Week and All-Time for each mode, plus a **Masters** board for the most buildings mastered. |
 | 🎖️ **16 badges**, **10 ranks** | From *Tourist* to *Chicago Hall of Fame*, earned with XP from every game. |
 
@@ -67,6 +68,20 @@ If the iPads can't reach the server, the game still works and an orange banner s
 2. Turn on **Guided Access** (Settings → Accessibility → Guided Access) to lock the iPad to the game.
 3. Set **Auto-Lock** to *Never* (or a long time) if the iPads stay plugged in.
 4. Turn the volume to a hallway-friendly level, or tap 🔊 in the game to mute it.
+
+## Classroom screen: Skyline Champions
+
+Open **`/skyline.html`** on a projector or TV (there's also a button on the teacher page). It's a full-screen, live version of the Skyline Leaderboard for the classroom:
+
+- Towers rise out of the ground one by one, with #1 last, and searchlights sweep from the champion's roof.
+- Each tower's real name is printed on the river below it.
+- It refreshes every 30 seconds. A new #1 gets a **"NEW #1!"** banner and confetti, and anyone who moves up shows a green ▲.
+- A scrolling "Next up" ticker shows the players just below the towers.
+- Controls appear when you move the mouse: Today / This Week / All-Time, 🔁 auto-switch between them, 10 / 15 / 20 towers, and full screen.
+- Keyboard: **F** full screen, **1 / 2 / 3** for Today / Week / All-Time.
+- Settings stay in the address bar, so you can bookmark a setup, e.g. `skyline.html?range=week&towers=15&cycle=1`.
+
+No password is needed; it only shows names, avatars and scores, the same as the in-game leaderboard.
 
 ## Teacher page
 

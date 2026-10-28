@@ -183,3 +183,20 @@ test('Vercel function works with Upstash and pre-parsed bodies', async (t) => {
   const lb = await callVercel(env, 'GET', '/api/index?path=leaderboard&mode=blitz&range=today');
   assert.strictEqual(lb.data.rows[0].score, 4200);
 });
+
+test('combined leaderboard adds up each player\'s best score in every mode', async (t) => {
+  backendName = 'file';
+  const { req } = await boot(t);
+  for (const [name, av] of [['Ava', '🦊'], ['Ben', '🐼'], ['Cy', '🐸']]) await req('PUT', '/api/players/' + name.toLowerCase(), { name, avatar: av });
+  const play = (name, mode, score) => req('POST', '/api/scores', { name, mode, score });
+  await play('Ava', 'classic', 5000); await play('Ava', 'classic', 3000); // only the best counts
+  await play('Ava', 'blitz', 2000);
+  await play('Ben', 'survival', 6500);
+  await play('Cy', 'classic', 100); await play('Cy', 'blitz', 100); await play('Cy', 'survival', 100);
+  for (const range of ['today', 'week', 'all']) {
+    const r = await req('GET', `/api/leaderboard?mode=combined&range=${range}`);
+    assert.deepStrictEqual(r.data.rows.map((x) => [x.name, x.score]), [['Ava', 7000], ['Ben', 6500], ['Cy', 300]], range);
+  }
+  const two = await req('GET', '/api/leaderboard?mode=combined&range=all&limit=2');
+  assert.strictEqual(two.data.rows.length, 2);
+});

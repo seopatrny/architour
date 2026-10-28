@@ -747,13 +747,14 @@
   }
 
   /* ---------------- leaderboard ---------------- */
-  async function showBoard(mode = App.boardMode || 'classic', range = App.boardRange || 'today') {
+  async function showBoard(mode = App.boardMode || 'combined', range = App.boardRange || 'today') {
     App.boardMode = mode;
     App.boardRange = range;
-    const tabs = [...Object.entries(MODES).map(([k, v]) => [k, `${v.icon} ${v.name}`]), ['masters', '🏅 Masters']];
+    const tabs = [['combined', '🌆 Skyline'], ...Object.entries(MODES).map(([k, v]) => [k, `${v.icon} ${v.name}`]), ['masters', '🏅 Masters']];
     show('board', `
       ${header('🏆 Leaderboard', App.player ? 'menu' : 'title')}
       <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === mode ? 'on' : ''}" data-m="${k}">${l}</button>`).join('')}</div>
+      ${mode === 'combined' ? '<p class="dex-hint">Your best Classic + Blitz + Survival scores added up. The higher you rank, the taller your tower!</p>' : ''}
       ${mode === 'masters' ? '<p class="dex-hint">Most buildings mastered</p>' : `<div class="tabs small">${[['today', 'Today'], ['week', 'This Week'], ['all', 'All-Time']].map(([k, l]) => `<button class="tab ${k === range ? 'on' : ''}" data-r="${k}">${l}</button>`).join('')}</div>`}
       <div id="boardBody" class="board"><div class="saving">Loading…</div></div>`);
     $$('[data-m]').forEach((t) => (t.onclick = () => { Sfx.play('click'); showBoard(t.dataset.m, range); }));
@@ -762,6 +763,7 @@
     try { rows = await Store.leaderboard(mode, range); } catch (e) { /* show empty */ }
     if (App.screen !== 'board' || App.boardMode !== mode || App.boardRange !== range) return;
     const me = App.player && Names.keyOf(App.player.name);
+    if (mode === 'combined') return showSkyline(rows, me);
     const unit = mode === 'masters' ? (r) => `${r.score} 🏅` : (r) => fmt(r.score);
     const body = $('#boardBody');
     if (!rows.length) { body.innerHTML = '<div class="empty">No scores yet. Be the first one on the board! 🚀</div>'; return; }
@@ -772,6 +774,18 @@
         <div class="pod-block">${[2, 1, 3][i]}</div></div>` : '<div class="pod empty-pod"></div>').join('');
     body.innerHTML = `<div class="podium">${podium}</div>
       <ol class="ranks" start="4">${rows.slice(3).map((r) => `<li class="${r.key === me ? 'me' : ''}"><span class="av">${esc(r.avatar)}</span><span class="rn">${esc(r.name)}</span><span class="rs">${unit(r)}</span></li>`).join('')}</ol>`;
+  }
+
+  function showSkyline(rows, me) {
+    const body = $('#boardBody');
+    body.className = 'board wide';
+    const count = innerWidth < 900 ? 7 : 10;
+    const mine = rows.findIndex((r) => r.key === me);
+    body.innerHTML = `<div class="skyline-board" id="skyBoard"></div>
+      ${rows.length > count ? `<h3 class="climbers">🧗 Still climbing</h3><ol class="ranks" start="${count + 1}" style="counter-reset:r ${count}">${rows.slice(count).map((r) => `<li class="${r.key === me ? 'me' : ''}"><span class="av">${esc(r.avatar)}</span><span class="rn">${esc(r.name)}</span><span class="rs">${fmt(r.score)}</span></li>`).join('')}</ol>` : ''}
+      ${mine < 0 && App.player ? '<p class="dex-hint">Play all three modes to build your total and claim a tower! 🏗️</p>' : ''}`;
+    const res = SkylineBoard.render($('#skyBoard'), rows, { count, me });
+    if (rows.length) setTimeout(() => { if (App.screen === 'board') { Sfx.play('win'); Fx.rain(80); } }, res.finishMs);
   }
 
   /* ---------------- badges ---------------- */

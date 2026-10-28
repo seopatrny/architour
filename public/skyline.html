@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Skyline Champions</title>
+  <meta name="description" content="Skyline Quest classroom display: the top players become the Chicago skyline.">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/skyline.css">
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #070720; color: #fff; font-family: 'Fredoka', system-ui, sans-serif; }
+    #board { position: fixed; inset: 0; }
+    .head { position: fixed; z-index: 10; top: 2.2vh; left: 2.5vw; right: 2.5vw; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
+    .title { font-family: 'Lilita One', sans-serif; font-size: clamp(28px, 4.6vw, 84px); line-height: 0.95; color: #ffd23f; text-shadow: 0 5px 0 #c2410c, 0 0 30px rgba(255, 210, 63, 0.45); }
+    .title span { color: #ff5e8a; text-shadow: 0 5px 0 #7e1d3f, 0 0 30px rgba(255, 94, 138, 0.45); }
+    .sub { font-size: clamp(13px, 1.4vw, 24px); color: #e7e3ff; margin-top: 1vh; }
+    .range { font-family: 'Lilita One', sans-serif; font-size: clamp(18px, 2.4vw, 42px); background: #38d9ff; color: #04304a; padding: 0.15em 0.7em; border-radius: 99px; box-shadow: 0 5px 0 #1a95b5; }
+    .range-wrap { text-align: right; }
+    .cta { margin-top: 1.2vh; font-size: clamp(12px, 1.3vw, 22px); color: #fff; background: rgba(0, 0, 0, 0.35); padding: 0.3em 0.8em; border-radius: 99px; display: inline-block; }
+    .ticker { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; height: 4.4vh; display: flex; align-items: center; overflow: hidden; background: rgba(0, 0, 0, 0.55); font-size: clamp(12px, 1.6vw, 26px); white-space: nowrap; }
+    .ticker:empty { display: none; }
+    .ticker .lead { font-family: 'Lilita One', sans-serif; background: #ff5e8a; height: 100%; display: flex; align-items: center; padding: 0 1em; flex: none; z-index: 1; }
+    .ticker .run { display: inline-block; padding-left: 100%; animation: run 40s linear infinite; }
+    .ticker .run b { color: #ffd23f; margin-left: 0.3em; }
+    .ticker .run span { margin-right: 2.4em; }
+    @keyframes run { to { transform: translateX(-100%); } }
+    .banner {
+      position: fixed; z-index: 30; left: 50%; top: 42%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;
+      font-family: 'Lilita One', sans-serif; font-size: clamp(40px, 8vw, 150px); color: #ffd23f; text-shadow: 0 8px 0 #c2410c, 0 0 50px #ff9f43;
+      animation: banner 4s ease-out forwards;
+    }
+    .banner small { display: block; font-size: 0.45em; color: #fff; text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); }
+    @keyframes banner { 0% { transform: translate(-50%, -50%) scale(0.2) rotate(-8deg); opacity: 0; } 12% { transform: translate(-50%, -50%) scale(1.1) rotate(-3deg); opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -70%) scale(1); } }
+    .msg { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; text-align: center; font-size: clamp(18px, 2.4vw, 36px); pointer-events: none; }
+    .msg:empty { display: none; }
+    .controls {
+      position: fixed; z-index: 40; right: 1.5vw; bottom: 6vh; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 92vw;
+      background: rgba(10, 8, 35, 0.85); padding: 10px; border-radius: 16px; transition: opacity 0.4s;
+    }
+    body.idle .controls { opacity: 0; pointer-events: none; }
+    body.idle { cursor: none; }
+    .controls button, .controls select { font: 600 15px 'Fredoka', system-ui, sans-serif; border: 0; border-radius: 10px; padding: 8px 12px; background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer; }
+    .controls button.on { background: #ffd23f; color: #3a2a00; }
+    .controls select option { color: #000; }
+    #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+  </style>
+</head>
+<body>
+  <div id="board"></div>
+  <div class="head">
+    <div>
+      <div class="title">SKYLINE <span>CHAMPIONS</span></div>
+      <div class="sub">Top total scores: best Classic + Speed Blitz + Survival. Climb the ranks to claim a taller tower!</div>
+    </div>
+    <div class="range-wrap"><span class="range" id="rangeLbl">TODAY</span><br><span class="cta">🎮 Play Skyline Quest on the iPads!</span></div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="ticker" id="ticker"></div>
+  <div class="controls" id="controls">
+    <button data-range="today">Today</button>
+    <button data-range="week">This Week</button>
+    <button data-range="all">All-Time</button>
+    <button id="cycle" title="Switch between Today, This Week and All-Time every 30 seconds">🔁 Auto-switch</button>
+    <select id="count" title="Number of towers">
+      <option value="10">10 towers</option>
+      <option value="15">15 towers</option>
+      <option value="20">20 towers</option>
+    </select>
+    <button id="full">⛶ Full screen</button>
+  </div>
+  <canvas id="fx"></canvas>
+
+  <script src="js/art.js"></script>
+  <script src="js/buildings.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/skyline-board.js"></script>
+  <script>
+    /* Settings can also come from the address bar, e.g. skyline.html?range=week&towers=15&cycle=1 */
+    const params = new URLSearchParams(location.search);
+    const RANGES = ['today', 'week', 'all'];
+    const LABELS = { today: 'TODAY', week: 'THIS WEEK', all: 'ALL-TIME' };
+    const REFRESH_MS = 30000;
+    const state = {
+      range: RANGES.includes(params.get('range')) ? params.get('range') : 'today',
+      count: [10, 15, 20].includes(+params.get('towers')) ? +params.get('towers') : (innerWidth >= 1400 ? 15 : 10),
+      cycle: params.get('cycle') === '1',
+      prev: null, rows: [], lastRange: null,
+    };
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function syncControls() {
+      document.querySelectorAll('[data-range]').forEach((b) => b.classList.toggle('on', b.dataset.range === state.range));
+      $('#cycle').classList.toggle('on', state.cycle);
+      $('#count').value = String(state.count);
+      $('#rangeLbl').textContent = LABELS[state.range];
+      const q = new URLSearchParams({ range: state.range, towers: state.count });
+      if (state.cycle) q.set('cycle', '1');
+      history.replaceState(null, '', '?' + q);
+    }
+
+    async function load({ animate } = {}) {
+      let rows;
+      try {
+        const r = await fetch(`api/leaderboard?mode=combined&range=${state.range}&limit=40`, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        rows = (await r.json()).rows;
+        $('#msg').textContent = '';
+      } catch (e) {
+        $('#msg').textContent = state.rows.length ? '' : "Can't reach the leaderboard right now. Trying again soon…";
+        return;
+      }
+      const rangeChanged = state.lastRange !== state.range;
+      const keys = rows.map((r) => r.key);
+      const sameAsBefore = !rangeChanged && JSON.stringify(rows) === JSON.stringify(state.rows);
+      if (sameAsBefore && !animate) return; // nothing new: leave the scene alone
+      const res = SkylineBoard.render($('#board'), rows, {
+        count: state.count, animate: animate || rangeChanged, topPad: innerHeight * 0.17,
+        prev: rangeChanged ? null : state.prev,
+      });
+      if (res.newLeader) celebrate(rows[0]);
+      else if (animate || rangeChanged) setTimeout(() => rows.length && Fx.rain(120), res.finishMs);
+      state.prev = keys;
+      state.rows = rows;
+      state.lastRange = state.range;
+      const rest = rows.slice(state.count);
+      $('#ticker').innerHTML = rest.length
+        ? `<span class="lead">🧗 NEXT UP</span><div><span class="run">${rest.map((r, i) => `<span>#${state.count + i + 1} ${esc(r.avatar)} ${esc(r.name)}<b>${r.score.toLocaleString('en-US')}</b></span>`).join('')}</span></div>`
+        : '';
+    }
+
+    function celebrate(row) {
+      const b = document.createElement('div');
+      b.className = 'banner';
+      b.innerHTML = `NEW #1!<small>${esc(row.avatar)} ${esc(row.name)} takes Willis Tower!</small>`;
+      document.body.appendChild(b);
+      Fx.rain(260);
+      setTimeout(() => b.remove(), 4200);
+    }
+
+    function setRange(r) { state.range = r; syncControls(); load({ animate: true }); }
+
+    document.querySelectorAll('[data-range]').forEach((b) => (b.onclick = () => { state.cycle = false; setRange(b.dataset.range); }));
+    $('#cycle').onclick = () => { state.cycle = !state.cycle; syncControls(); };
+    $('#count').onchange = (e) => { state.count = +e.target.value; syncControls(); load({ animate: true }); };
+    $('#full').onclick = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') $('#full').click();
+      if (e.key === '1' || e.key === '2' || e.key === '3') { state.cycle = false; setRange(RANGES[+e.key - 1]); }
+    });
+
+    // hide the controls (and the mouse) when nobody is touching the screen
+    let idleTimer;
+    const wake = () => { document.body.classList.remove('idle'); clearTimeout(idleTimer); idleTimer = setTimeout(() => document.body.classList.add('idle'), 3500); };
+    ['mousemove', 'pointerdown', 'keydown'].forEach((ev) => addEventListener(ev, wake));
+    wake();
+
+    let resizeTimer;
+    addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => state.rows && SkylineBoard.render($('#board'), state.rows, { count: state.count, animate: false, topPad: innerHeight * 0.17 }), 250); });
+
+    setInterval(() => {
+      if (state.cycle) setRange(RANGES[(RANGES.indexOf(state.range) + 1) % RANGES.length]);
+      else load();
+    }, REFRESH_MS);
+
+    syncControls();
+    load({ animate: true });
+  </script>
+</body>
+</html>

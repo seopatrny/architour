@@ -1,7 +1,7 @@
 /* Keeps the game working if the school Wi-Fi blips: network first, cached copy as backup.
  * Leaderboard calls (/api/) are never cached. */
-const CACHE = 'skyline-quest-v4';
-const CORE = ['./', 'index.html', 'css/style.css', 'js/names.js', 'js/art.js', 'js/buildings.js', 'js/store.js', 'js/fx.js', 'js/photo-sources.js', 'js/photos.js', 'js/game.js', 'img/icon.svg', 'manifest.webmanifest'];
+const CACHE = 'skyline-quest-v5';
+const CORE = ['./', 'index.html', 'css/style.css', 'css/skyline.css', 'js/names.js', 'js/art.js', 'js/buildings.js', 'js/store.js', 'js/fx.js', 'js/photo-sources.js', 'js/photos.js', 'js/skyline-board.js', 'js/game.js', 'img/icon.svg', 'manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
