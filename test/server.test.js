@@ -200,3 +200,9 @@ test('combined leaderboard adds up each player\'s best score in every mode', asy
   const two = await req('GET', '/api/leaderboard?mode=combined&range=all&limit=2');
   assert.strictEqual(two.data.rows.length, 2);
 });
+
+test('Vercel function reports which deployment it is (for the test-version banner)', async (t) => {
+  const env = { VERCEL: '1', VERCEL_ENV: 'preview', KV_REST_API_URL: await fakeUpstash(t), KV_REST_API_TOKEN: 'tok' };
+  assert.strictEqual((await callVercel(env, 'GET', '/api/health')).data.deployment, 'preview');
+  assert.strictEqual((await callVercel({ VERCEL: '1', VERCEL_ENV: 'production' }, 'GET', '/api/health')).data.deployment, 'production');
+});

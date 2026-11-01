@@ -41,6 +41,22 @@ Built for 2–5 minute sessions during breaks and passing periods: tap to play, 
 
 To check it worked, open `https://<your-site>/api/health`. It should say `"ok":true` and `"storage":"upstash"`. If it says `"ok":false`, the message explains what's missing, and the game shows an orange **"Offline mode"** banner until it's fixed.
 
+## Testing changes before they go live
+
+The `main` branch is the live game. Every other branch gets its own private **preview** link from Vercel, so you can try changes without students seeing them.
+
+**One-time setup**
+1. **GitHub:** create a `main` branch from the current live version and make it the default branch (repo **Settings → General → Default branch**).
+2. **Vercel:** set the production branch to `main` (**Settings → Environments → Production → Branch Tracking**, or **Settings → Git** on older dashboards).
+3. **Test database:** create a second free Upstash Redis database (e.g. `skyline-test`) and connect it to **Preview** only. Make sure your real database is connected to **Production** only. That keeps test scores off the real leaderboard.
+4. **Admin key for previews:** in **Settings → Environment Variables**, make sure `ADMIN_KEY` is also set for **Preview**.
+
+**Every update**
+1. Changes are pushed to a branch other than `main`. Vercel builds a preview and lists it under **Deployments** (marked *Preview*). The link also appears next to the commit on GitHub.
+2. Preview pages show a purple **🧪 TEST VERSION** strip at the bottom, so they're never confused with the real game. To test on an iPad that isn't logged in to Vercel, use the deployment's **Share** button to get a link.
+3. Happy with it? Merge the branch into `main` (a pull request), and Vercel updates the live game.
+4. Something wrong after a release? In **Deployments**, pick the previous production deployment and choose **Instant Rollback**.
+
 ## Or run it on a school computer
 
 You need [Node.js](https://nodejs.org) 18 or newer. There are no packages to install. Players and scores are saved to a file.

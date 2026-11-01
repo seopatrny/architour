@@ -7,6 +7,7 @@ const { store, error } = storageFromEnv();
 const app = createApp({
   store,
   storageError: error,
+  deployment: process.env.VERCEL_ENV || 'local',
   adminKey: process.env.ADMIN_KEY || '',
   timeZone: process.env.TIME_ZONE || 'America/Chicago',
 });

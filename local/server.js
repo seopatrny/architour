@@ -31,6 +31,7 @@ function createServer(opts = {}) {
     adminKey: opts.adminKey != null ? opts.adminKey : process.env.ADMIN_KEY || '',
     timeZone: opts.timeZone || process.env.TIME_ZONE || 'America/Chicago',
     fetchImpl: opts.fetchImpl,
+    deployment: opts.deployment || process.env.VERCEL_ENV || 'local',
   });
 
   function serveStatic(req, res, url) {
