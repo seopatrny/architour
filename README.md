@@ -48,12 +48,12 @@ The `main` branch is the live game. Every other branch gets its own private **pr
 **One-time setup**
 1. **GitHub:** create a `main` branch from the current live version and make it the default branch (repo **Settings → General → Default branch**).
 2. **Vercel:** set the production branch to `main` (**Settings → Environments → Production → Branch Tracking**, or **Settings → Git** on older dashboards).
-3. **Test database:** create a second free Upstash Redis database (e.g. `skyline-test`) and connect it to **Preview** only. Make sure your real database is connected to **Production** only. That keeps test scores off the real leaderboard.
+3. **Test data:** connect your existing Upstash database to **Preview** as well as Production (in Vercel: **Storage →** your database **→ Projects** / settings). No second database is needed: preview deployments automatically keep their players, scores and photo picks in a separate section of the database (`skyq-preview`), so test scores never show up on the real leaderboard. *(Optional: set a `DATA_NAMESPACE` environment variable to choose a different section name.)*
 4. **Admin key for previews:** in **Settings → Environment Variables**, make sure `ADMIN_KEY` is also set for **Preview**.
 
 **Every update**
 1. Changes are pushed to a branch other than `main`. Vercel builds a preview and lists it under **Deployments** (marked *Preview*). The link also appears next to the commit on GitHub.
-2. Preview pages show a purple **🧪 TEST VERSION** strip at the bottom, so they're never confused with the real game. To test on an iPad that isn't logged in to Vercel, use the deployment's **Share** button to get a link.
+2. Preview pages show a purple **🧪 TEST VERSION** strip at the bottom, so they're never confused with the real game. Their leaderboard starts empty, separate from the real one. To test on an iPad that isn't logged in to Vercel, use the deployment's **Share** button to get a link.
 3. Happy with it? Merge the branch into `main` (a pull request), and Vercel updates the live game.
 4. Something wrong after a release? In **Deployments**, pick the previous production deployment and choose **Instant Rollback**.
 

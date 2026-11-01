@@ -13,7 +13,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { createApp } = require('../lib/app.js');
-const { createFileStore, storageFromEnv } = require('../lib/storage.js');
+const { createFileStore, storageFromEnv, namespaceFromEnv } = require('../lib/storage.js');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const MIME = {
@@ -32,6 +32,7 @@ function createServer(opts = {}) {
     timeZone: opts.timeZone || process.env.TIME_ZONE || 'America/Chicago',
     fetchImpl: opts.fetchImpl,
     deployment: opts.deployment || process.env.VERCEL_ENV || 'local',
+    namespace: opts.namespace || namespaceFromEnv(),
   });
 
   function serveStatic(req, res, url) {

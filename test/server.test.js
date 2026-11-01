@@ -142,7 +142,7 @@ test('saves data to disk and loads it back', async (t) => {
 });
 
 // Calls api/index.js the way Vercel does: a Node req/res, with the JSON body already parsed.
-async function callVercel(env, method, url, body) {
+async function callVercel(env, method, url, body, headers = {}) {
   const saved = { ...process.env };
   Object.assign(process.env, env);
   delete require.cache[require.resolve('../api/index.js')];
@@ -150,7 +150,7 @@ async function callVercel(env, method, url, body) {
   Object.keys(process.env).forEach((k) => { if (!(k in saved)) delete process.env[k]; });
   Object.assign(process.env, saved);
   const { Readable } = require('stream');
-  const req = Object.assign(Readable.from([]), { method, url, headers: {}, body });
+  const req = Object.assign(Readable.from([]), { method, url, headers, body });
   return new Promise((resolve) => {
     const res = {
       status: 0,
@@ -205,4 +205,22 @@ test('Vercel function reports which deployment it is (for the test-version banne
   const env = { VERCEL: '1', VERCEL_ENV: 'preview', KV_REST_API_URL: await fakeUpstash(t), KV_REST_API_TOKEN: 'tok' };
   assert.strictEqual((await callVercel(env, 'GET', '/api/health')).data.deployment, 'preview');
   assert.strictEqual((await callVercel({ VERCEL: '1', VERCEL_ENV: 'production' }, 'GET', '/api/health')).data.deployment, 'production');
+});
+
+test('preview deployments keep their data apart from the live game in the same database', async (t) => {
+  const url = await fakeUpstash(t);
+  const live = { VERCEL: '1', VERCEL_ENV: 'production', KV_REST_API_URL: url, KV_REST_API_TOKEN: 'tok' };
+  const preview = Object.assign({}, live, { VERCEL_ENV: 'preview' });
+  assert.strictEqual((await callVercel(preview, 'GET', '/api/health')).data.data, 'skyq-preview');
+  await callVercel(preview, 'PUT', '/api/players/tess', { name: 'Tess', avatar: '🐙' });
+  await callVercel(preview, 'POST', '/api/scores', { name: 'Tess', mode: 'classic', score: 9999 });
+  assert.strictEqual((await callVercel(live, 'GET', '/api/players/tess')).status, 404, 'test player not in the live game');
+  assert.strictEqual((await callVercel(live, 'GET', '/api/leaderboard?mode=classic&range=all')).data.rows.length, 0);
+  assert.strictEqual((await callVercel(preview, 'GET', '/api/leaderboard?mode=classic&range=all')).data.rows[0].name, 'Tess');
+  // wiping the test data leaves the live game alone
+  await callVercel(live, 'PUT', '/api/players/real', { name: 'Real', avatar: '🦊' });
+  const wiped = await callVercel(Object.assign({ ADMIN_KEY: 'x' }, preview), 'DELETE', '/api/admin/everything', undefined, { 'x-admin-key': 'x' });
+  assert.strictEqual(wiped.status, 200);
+  assert.strictEqual((await callVercel(preview, 'GET', '/api/players/tess')).status, 404, 'test data wiped');
+  assert.strictEqual((await callVercel(live, 'GET', '/api/players/real')).status, 200);
 });
