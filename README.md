@@ -85,6 +85,10 @@ If the iPads can't reach the server, the game still works and an orange banner s
 3. Set **Auto-Lock** to *Never* (or a long time) if the iPads stay plugged in.
 4. Turn the volume to a hallway-friendly level, or tap 🔊 in the game to mute it.
 
+## Building Dex for teachers
+
+Open **`/dex.html`** (or **Open the Building Dex** on the teacher page) to see every building fully unlocked: photo, year, height, architect, "how to spot it" tip, fun facts and the quiz clues the game uses. Search by any word, filter by level (Rookie / Pro / Legend), or press **🖨️ Print** for a study sheet.
+
 ## Classroom screen: Skyline Champions
 
 Open **`/skyline.html`** on a projector or TV (there's also a button on the teacher page). It's a full-screen, live version of the Skyline Leaderboard for the classroom:

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building Dex – Teacher Guide</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <style>
+    :root { --bg: #f5f4fb; --ink: #1b1840; --muted: #6b6890; --line: #e2e0f0; --accent: #5b3fd6; --gold: #c99a06; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, Segoe UI, sans-serif; }
+    main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+    h1 { margin: 0 0 4px; font-size: 26px; }
+    .sub { color: var(--muted); margin: 0 0 16px; }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 2; }
+    .tools input { flex: 1; min-width: 200px; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); }
+    .tools button { font: inherit; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+    .tools button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .count { color: var(--muted); font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: 130px 1fr; break-inside: avoid; }
+    .pic { background: #e9e7f5; position: relative; align-self: start; aspect-ratio: 2 / 3; }
+    .pic svg, .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .stop { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 12px; padding: 1px 7px; border-radius: 99px; z-index: 1; }
+    .info { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .tier { font-size: 12px; color: var(--gold); font-weight: 600; }
+    .name { font-size: 18px; font-weight: 700; line-height: 1.2; }
+    .aka { font-size: 13px; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { font-size: 12px; background: #f0eefb; border-radius: 99px; padding: 2px 9px; }
+    .spot { font-size: 13px; background: #eaf8fd; border-left: 4px solid #38b6d9; padding: 6px 9px; border-radius: 6px; }
+    .label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    ul { margin: 0; padding-left: 18px; font-size: 13px; }
+    li { margin-bottom: 3px; }
+    .clues li { font-style: italic; }
+    .credit { font-size: 11px; color: var(--muted); }
+    .empty { color: var(--muted); padding: 30px 0; }
+    @media print {
+      .tools, .sub a { display: none; }
+      body { background: #fff; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .card { border-color: #ccc; }
+    }
+    @media (max-width: 420px) { .card { grid-template-columns: 1fr; } .pic { max-width: 220px; width: 100%; margin: 0 auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>📚 Building Dex – Teacher Guide</h1>
+  <p class="sub">Every building in Skyline Quest, in river-tour order, with facts, spotting tips and the clues the game uses in questions. <a href="admin.html">← Teacher page</a></p>
+  <div class="tools">
+    <input id="q" placeholder="Search names, architects, facts…" autocomplete="off">
+    <button data-tier="0" class="on">All</button>
+    <button data-tier="1">⭐ Rookie</button>
+    <button data-tier="2">⭐⭐ Pro</button>
+    <button data-tier="3">⭐⭐⭐ Legend</button>
+    <button id="print">🖨️ Print</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<script src="js/art.js"></script>
+<script src="js/buildings.js"></script>
+<script src="js/env-badge.js"></script>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let tier = 0, photos = {};
+
+  function picture(b) {
+    const drawing = Art.renderBuilding(b);
+    const src = b.photo ? `img/buildings/${b.id}.jpg` : photos[b.id] && photos[b.id].src;
+    // the drawing stays underneath in case the photo can't load
+    return src ? `${drawing}<img src="${esc(src)}" alt="${esc(b.name)}" loading="lazy" onerror="this.remove()">` : drawing;
+  }
+
+  function render() {
+    const q = $('#q').value.trim().toLowerCase();
+    const list = BUILDINGS.filter((b) => (!tier || b.tier === tier) &&
+      (!q || [b.name, b.aka, b.architect, b.spot, ...b.facts, ...b.clues].join(' ').toLowerCase().includes(q)));
+    $('#count').textContent = `${list.length} of ${BUILDINGS.length}`;
+    $('#grid').innerHTML = list.map((b) => {
+      const ph = !b.photo && photos[b.id];
+      return `<article class="card">
+        <div class="pic"><span class="stop">#${b.stop}</span>${picture(b)}</div>
+        <div class="info">
+          <div class="tier">${'⭐'.repeat(b.tier)} ${TIERS[b.tier]}</div>
+          <div class="name">${esc(b.name)}</div>
+          ${b.aka ? `<div class="aka">also called ${esc(b.aka)}</div>` : ''}
+          ${b.nickname ? `<div class="aka">nickname: ${esc(b.nickname)}</div>` : ''}
+          <div class="chips">
+            ${b.kind ? `<span class="chip">${esc(b.kind)}</span>` : ''}
+            ${b.year ? `<span class="chip">📅 ${b.year}</span>` : ''}
+            ${b.height ? `<span class="chip">📏 ${b.height.toLocaleString('en-US')} ft</span>` : ''}
+            ${b.floors ? `<span class="chip">🏢 ${b.floors} floors</span>` : ''}
+            ${b.architect ? `<span class="chip">✏️ ${esc(b.architect)}</span>` : ''}
+          </div>
+          <div class="spot"><b>👀 How to spot it:</b> ${esc(b.spot)}</div>
+          <div class="label">Fun facts</div>
+          <ul>${b.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+          <div class="label">Quiz clues</div>
+          <ul class="clues">${b.clues.map((c) => `<li>“${esc(c)}”</li>`).join('')}</ul>
+          ${ph ? `<div class="credit">📷 ${esc(ph.artist)} · ${esc(ph.license)} · Wikimedia Commons</div>` : ''}
+        </div>
+      </article>`;
+    }).join('') || '<p class="empty">No buildings match your search.</p>';
+  }
+
+  document.querySelectorAll('[data-tier]').forEach((b) => (b.onclick = () => {
+    tier = +b.dataset.tier;
+    document.querySelectorAll('[data-tier]').forEach((x) => x.classList.toggle('on', x === b));
+    render();
+  }));
+  $('#q').oninput = render;
+  $('#print').onclick = () => window.print();
+  render();
+  // show the same real photos the game uses, once the server sends the list
+  fetch('api/photos').then((r) => r.json()).then((d) => { photos = d.photos || {}; render(); }).catch(() => {});
+</script>
+</body>
+</html>
