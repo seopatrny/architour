@@ -66,7 +66,7 @@
     const drawing = Art.renderBuilding(b, opts);
     if (opts.shadow) return drawing;
     const ph = Photos.get(b.id);
-    const src = b.photo ? `img/buildings/${b.id}.jpg` : ph && ph.src;
+    const src = photoSource(b, ph);
     if (!src) {
       // photo list still on its way: show the drawing for now and swap it when it arrives
       return Photos.settled ? drawing : `<div class="photo-pending" data-id="${b.id}" data-title="${esc(opts.title || '')}">${drawing}</div>`;
@@ -82,16 +82,25 @@
     });
   });
 
+  // which picture a building shows: a photo a teacher picked, then the building's own photo, then Wikimedia's
+  function photoSource(b, ph) {
+    if (ph && ph.none) return null;
+    if (ph && ph.chosenBy === 'teacher') return ph.src;
+    if (b.photo) return `img/buildings/${b.id}.jpg`;
+    return ph && ph.src;
+  }
+  const commonsPhoto = (b) => { const ph = Photos.get(b.id); return ph && photoSource(b, ph) === ph.src ? ph : null; };
+
   function credit(b) {
-    const ph = !b.photo && Photos.get(b.id);
+    const ph = commonsPhoto(b);
     if (!ph) return '';
     return `<div class="credit">📷 ${esc(ph.artist)} · ${esc(ph.license)} · Wikimedia Commons</div>`;
   }
 
   function showCredits() {
-    const rows = BUILDINGS.map((b) => [b, !b.photo && Photos.get(b.id)]).filter(([, ph]) => ph);
+    const rows = BUILDINGS.map((b) => [b, commonsPhoto(b)]).filter(([, ph]) => ph);
     modal(`<button class="x" data-close>✖</button><h3>📷 Photo credits</h3>
-      <p class="credits-intro">Building photos come from Wikimedia Commons and are used under their free licenses. Thank you, photographers!</p>
+      <p class="credits-intro">Most building photos come from our class river tour photo sheet. The ones below come from Wikimedia Commons and are used under their free licenses. Thank you, photographers!</p>
       ${rows.length ? `<ul class="credits">${rows.map(([b, ph]) => `<li><b>${esc(b.name)}</b> – ${esc(ph.artist)}, <i>${esc(ph.license)}</i>
         <small>${esc(ph.filePage || ph.file)}${ph.licenseUrl ? ` · ${esc(ph.licenseUrl)}` : ''}</small></li>`).join('')}</ul>`
         : '<p>Photos haven\'t loaded yet, so the game is showing drawings.</p>'}`, 'card-modal');
@@ -731,11 +740,12 @@
           ${b.aka ? `<div class="aka">also called <b>${esc(b.aka)}</b></div>` : ''}
           ${b.nickname ? `<div class="aka">nickname: <b>${esc(b.nickname)}</b></div>` : ''}
           <div class="chips">
-            <span class="chip">📅 ${b.year}</span>
-            <span class="chip">📏 ${fmt(b.height)} ft</span>
-            <span class="chip">🏢 ${b.floors} floors</span>
+            ${b.kind ? `<span class="chip">${esc(b.kind)}</span>` : ''}
+            ${b.year ? `<span class="chip">📅 ${b.year}</span>` : ''}
+            ${b.height ? `<span class="chip">📏 ${fmt(b.height)} ft</span>` : ''}
+            ${b.floors ? `<span class="chip">🏢 ${b.floors} floors</span>` : ''}
           </div>
-          <div class="chip wide">✏️ ${esc(b.architect)}</div>
+          ${b.architect ? `<div class="chip wide">✏️ ${esc(b.architect)}</div>` : ''}
           <div class="spot"><b>👀 How to spot it:</b> ${esc(b.spot)}</div>
           <ul class="facts">${b.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
           <div class="mastery">Mastery: ${stars(Math.min(MASTERED, m))} ${m >= MASTERED ? '<b class="gold-txt">MASTERED!</b>' : `<small>${MASTERED - m} more to master</small>`}</div>

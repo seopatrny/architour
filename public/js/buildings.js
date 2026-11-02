@@ -2,8 +2,9 @@
  *
  * tier 1 = Rookie (the superstars), 2 = Pro, 3 = Legend.
  * clues never say the building's name – they power the "Clue Detective" questions.
- * photo (optional): put a picture at public/img/buildings/<id>.jpg and set photo: true
- * to show the real photo instead of the illustration.
+ * photo: true means the building has its own picture at public/img/buildings/<id>.jpg
+ * (these came from the teacher's river tour photo sheet). Buildings without one use a
+ * Wikimedia Commons photo. A photo picked on the teacher page beats both.
  *
  * Every drawing uses a 200 x 300 box with the ground at y = 285. */
 (function (root) {
@@ -36,7 +37,7 @@
       },
     },
     {
-      id: 'aqua', name: 'Aqua Tower', tier: 1, year: 2009, height: 859, floors: 82,
+      id: 'aqua', photo: true, name: 'Aqua Tower', tier: 1, year: 2009, height: 859, floors: 82,
       architect: 'Jeanne Gang (Studio Gang)',       spot: 'Look for white balconies that ripple up the tower like waves on water.',
       facts: [
         'Its wavy concrete balconies are all different shapes – no two floors are the same.',
@@ -60,7 +61,7 @@
       },
     },
     {
-      id: 'stregis', name: 'St. Regis Chicago', aka: 'Vista Tower', tier: 1, year: 2020, height: 1191, floors: 101,
+      id: 'stregis', photo: true, name: 'St. Regis Chicago', aka: 'Vista Tower', tier: 1, year: 2020, height: 1191, floors: 101,
       architect: 'Jeanne Gang (Studio Gang)',       spot: 'Three blue-green glass towers of different heights, stacked like wobbly blocks.',
       facts: [
         "It's the 3rd-tallest building in Chicago.",
@@ -92,7 +93,7 @@
       },
     },
     {
-      id: 'nbc', name: 'NBC Tower', tier: 2, year: 1989, height: 627, floors: 40,
+      id: 'nbc', photo: true, name: 'NBC Tower', tier: 2, year: 1989, height: 627, floors: 40,
       architect: 'Adrian Smith (SOM)',       spot: 'A cream-colored stone tower that steps in like a wedding cake, topped by a needle.',
       facts: [
         'It was built in 1989 but designed to look like a 1930s Art Deco skyscraper.',
@@ -109,6 +110,34 @@
         s += d.W(88, 58, 24, 26, st, o) + d.W(78, 82, 44, 38, st, o) + d.W(68, 118, 64, 44, st, o) + d.W(58, 160, 84, 125, st, o);
         s += d.R(58, 160, 8, 125, 'rgba(0,0,0,.08)') + d.R(134, 160, 8, 125, 'rgba(0,0,0,.08)');
         s += d.R(92, 255, 16, 30, '#6b5c45', 'rx="2"');
+        return s;
+      },
+    },
+    {
+      id: 'riverwalk', photo: true, noShadow: true, name: 'Chicago Riverwalk', kind: '🚶 Riverside path', tier: 2, year: 2016,
+      architect: 'Sasaki and Ross Barney Architects',
+      spot: 'A long stone path with wide steps down to the water along the Main Branch, full of people, cafés and kayaks.',
+      facts: [
+        "It runs about 1.25 miles along the south bank of the river's Main Branch.",
+        'It is split into "rooms" like The Jetty, The Cove and Marina Plaza, each with something different to do.',
+        'You can rent a kayak, go fishing, or eat at a café right next to the water.',
+      ],
+      clues: [
+        "I'm not a building! I'm a long path of steps and walkways right along the water.",
+        'You can kayak, fish and snack in my "rooms" next to the water.',
+      ],
+      draw(d) {
+        let s = '';
+        for (const [x, y, w, h, c] of [[8, 70, 38, 160, '#b9c6d3'], [50, 110, 30, 120, '#c9d3dc'], [128, 40, 36, 190, '#aebccb'], [168, 95, 28, 135, '#c2ccd6']]) {
+          s += d.W(x, y, w, h, c, { cw: 6, rh: 7, ww: 3, wh: 4, c: '#e6eef5' });
+        }
+        s += d.R(0, 212, 200, 14, '#e4d8bf') + d.R(0, 210, 200, 3, '#9d9077');
+        for (let k = 0; k < 6; k++) s += d.R(0, 226 + k * 10, 200, 10, k % 2 ? '#d6c8aa' : '#c6b590') + d.R(0, 226 + k * 10, 200, 1.2, '#a8987a');
+        for (const x of [26, 98, 170]) s += d.R(x - 1.5, 186, 3, 26, '#6b4f36') + d.C(x, 182, 13, '#5fa35a') + d.C(x - 6, 188, 8, '#4f9150');
+        for (const x of [60, 136]) s += d.R(x - 1, 178, 2, 34, '#333') + d.C(x, 177, 4, '#ffe9a3');
+        const ppl = [[40, 233, '#e74c3c'], [52, 243, '#3498db'], [86, 236, '#f1c40f'], [118, 253, '#9b59b6'], [150, 243, '#2ecc71'], [164, 263, '#e67e22']];
+        for (const [x, y, c] of ppl) s += d.R(x - 3, y - 6, 6, 8, c, 'rx="2"') + d.C(x, y - 9, 3, '#f1c9a5');
+        s += d.P('120,282 150,282 146,286 124,286', '#f1c40f') + d.R(128, 278, 14, 4, '#f1c40f', 'rx="1"');
         return s;
       },
     },
@@ -203,7 +232,7 @@
       },
     },
     {
-      id: 'tribune', name: 'Tribune Tower', tier: 1, year: 1925, height: 462, floors: 36,
+      id: 'tribune', photo: true, name: 'Tribune Tower', tier: 1, year: 1925, height: 462, floors: 36,
       architect: 'John Mead Howells & Raymond Hood',       spot: 'A cream stone tower with a crown of flying buttresses, like a castle or cathedral.',
       facts: [
         'Its design won a worldwide contest in 1922 with more than 260 entries.',
@@ -228,7 +257,7 @@
       },
     },
     {
-      id: 'wrigley', name: 'Wrigley Building', tier: 1, year: 1924, height: 425, floors: 30,
+      id: 'wrigley', photo: true, name: 'Wrigley Building', tier: 1, year: 1924, height: 425, floors: 30,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A gleaming white building with a big clock tower right by the Michigan Avenue bridge.',
       facts: [
         'Its clock tower was inspired by the Giralda tower in Seville, Spain.',
@@ -346,7 +375,7 @@
       },
     },
     {
-      id: 'trump', name: 'Trump International Hotel & Tower', tier: 1, year: 2009, height: 1388, floors: 98,
+      id: 'trump', photo: true, name: 'Trump International Hotel & Tower', tier: 1, year: 2009, height: 1388, floors: 98,
       architect: 'Adrian Smith (SOM)',       spot: 'A shiny silver-blue glass tower with three step-backs and a tall spire.',
       facts: [
         "Its step-backs line up with the heights of its neighbors, like the Wrigley Building's top.",
@@ -367,7 +396,7 @@
       },
     },
     {
-      id: 'amaplaza', noShadow: true, name: 'AMA Plaza', aka: 'IBM Building (330 North Wabash)', tier: 2, year: 1973, height: 695, floors: 52,
+      id: 'amaplaza', photo: true, noShadow: true, name: 'AMA Plaza', aka: 'IBM Building (330 North Wabash)', tier: 2, year: 1973, height: 695, floors: 52,
       architect: 'Ludwig Mies van der Rohe',       spot: 'A plain, dark black box with a neat grid of bronze windows – no decorations at all.',
       facts: [
         'It was the last American office building designed by the famous architect Mies van der Rohe.',
@@ -386,7 +415,7 @@
       },
     },
     {
-      id: 'marina', name: 'Marina City', tier: 1, year: 1964, height: 587, floors: 65,
+      id: 'marina', photo: true, name: 'Marina City', tier: 1, year: 1964, height: 587, floors: 65,
       architect: 'Bertrand Goldberg', nickname: 'The Corncobs',
       spot: 'Two round towers that look exactly like corncobs, with parking on the bottom floors.',
       facts: [
@@ -425,7 +454,7 @@
       },
     },
     {
-      id: 'reidmurdoch', name: 'Reid Murdoch Building', tier: 3, year: 1914, height: 120, floors: 8,
+      id: 'reidmurdoch', photo: true, name: 'Reid Murdoch Building', tier: 3, year: 1914, height: 120, floors: 8,
       architect: 'George C. Nimmons',       spot: 'A long, low red-brick building with a clock tower, right on the river bank.',
       facts: [
         'It was a giant grocery warehouse – boats unloaded food right at its river doors.',
@@ -443,6 +472,30 @@
         s += d.W(84, 112, 32, 72, br, { cw: 8, rh: 11, ww: 3, wh: 6, c: '#3a2a22' });
         s += d.R(82, 108, 36, 5, '#e8dcc0') + d.P('84,108 100,90 116,108', '#6a8f80');
         s += d.C(100, 128, 9, '#f8f4ea', 'stroke="#2b2b2b" stroke-width="1.4"') + d.L(100, 128, 100, 122, '#222', 1.2) + d.L(100, 128, 104, 130, '#222', 1.2);
+        return s;
+      },
+    },
+    {
+      id: 'lasalle300', photo: true, name: '300 North LaSalle', tier: 3, year: 2009, height: 785, floors: 60,
+      architect: 'Pickard Chilton',
+      spot: 'A tall silvery-blue glass tower with a stepped top, right on the river at LaSalle Street.',
+      facts: [
+        'It is 60 stories tall and was finished in 2009.',
+        'Its top steps in like a staircase made of glass.',
+        'Its architects, Pickard Chilton, also designed River Point with its giant arch.',
+      ],
+      clues: [
+        "I'm 60 stories of glass with a top that steps in like a staircase, right on the river's main branch.",
+        'The same architects who made the giant glass arch at River Point designed me.',
+      ],
+      draw(d) {
+        const g = () => d.lg([[0, '#7f9cb3'], [0.5, '#dbe8f1'], [1, '#7896ad']]);
+        let s = '';
+        for (const [x, y, w, h] of [[84, 38, 32, 18], [78, 54, 44, 20], [72, 72, 56, 22], [66, 92, 68, 193]]) {
+          s += d.R(x, y, w, h, g()) + d.V(x, y, w, h, 4.5, 0.9, 'rgba(55,80,100,.5)') + d.R(x, y, w, 1.6, '#f4f8fb');
+        }
+        s += d.H(66, 92, 68, 193, 5, 0.5, 'rgba(55,80,100,.35)');
+        s += d.W(18, 236, 48, 49, '#a14a33', { cw: 6, rh: 7, ww: 3, wh: 4, c: '#3a2a22' });
         return s;
       },
     },
@@ -467,7 +520,7 @@
       },
     },
     {
-      id: 'wacker333', noShadow: true, name: '333 Wacker Drive', tier: 2, year: 1983, height: 487, floors: 36,
+      id: 'wacker333', photo: true, noShadow: true, name: '333 Wacker Drive', tier: 2, year: 1983, height: 487, floors: 36,
       architect: 'Kohn Pedersen Fox',       spot: 'A curvy green glass building that bends right along the bend in the river.',
       facts: [
         'Its curved green glass follows the bend in the river exactly – it mirrors the water!',
@@ -489,7 +542,7 @@
       },
     },
     {
-      id: 'mart', name: 'Merchandise Mart', tier: 1, year: 1930, height: 343, floors: 25,
+      id: 'mart', photo: true, name: 'Merchandise Mart', tier: 1, year: 1930, height: 343, floors: 25,
       architect: 'Graham, Anderson, Probst & White', nickname: 'theMART',
       spot: 'A HUGE, wide tan building that stretches along the river for two whole blocks.',
       facts: [
@@ -513,28 +566,88 @@
       },
     },
     {
-      id: 'salesforce', name: 'Salesforce Tower Chicago', tier: 3, year: 2023, height: 818, floors: 60,
-      architect: 'Pelli Clarke & Partners',       spot: 'A silvery glass tower made of three stacked blocks, standing where the river splits.',
+      id: 'kinzie', photo: true, name: 'Kinzie Street Railroad Bridge', kind: '🌉 Drawbridge', tier: 2, year: 1908,
+      spot: 'A huge rusty-brown steel bridge stuck pointing up at the sky, on the North Branch near the Merchandise Mart.',
       facts: [
-        'It stands on Wolf Point, where the river splits into its North and South Branches.',
-        "Wolf Point is where some of Chicago's very first settlers built cabins and a tavern in the 1820s.",
-        'It was finished in 2023, making it one of the newest towers on the river.',
+        'When it was built in 1908, it was the longest and heaviest bascule (drawbridge) span in the world.',
+        'Trains stopped using it around 2000, so now it stays raised up in the air almost all the time.',
+        'A bascule bridge works like a seesaw: a heavy counterweight lets the giant span swing up.',
       ],
       clues: [
-        "I'm a new glass tower made of three stacked blocks, standing where the river splits in two.",
-        "I stand on a point named after a wolf, where Chicago's first settlers lived.",
+        "I'm a giant rusty steel truss that's stuck pointing up at the sky.",
+        'Trains used to cross the river on me. Now I just stay raised up in the air.',
       ],
       draw(d) {
-        const g = () => d.lg([[0, '#6d8ea8'], [0.5, '#d3e4ef'], [1, '#6a8aa3']]);
-        let s = '';
-        const vols = [[64, 38, 66, 80], [57, 114, 82, 80], [50, 190, 96, 95]];
-        for (const [x, y, w, h] of vols) s += d.R(x, y, w, h, g(), 'rx="9"') + d.V(x + 3, y, w - 6, h, 4, 0.9, 'rgba(60,85,105,.45)');
-        s += d.R(60, 112, 74, 4, '#6fae63', 'rx="2"') + d.R(54, 188, 88, 4, '#6fae63', 'rx="2"');
+        let s = d.R(8, 248, 74, 37, '#8d8a84') + d.R(8, 248, 74, 4, '#a9a59d');
+        s += d.R(16, 220, 28, 28, '#6b4a33') + d.P('14,220 30,208 46,220', '#4e3526') + d.R(21, 228, 7, 7, '#e8d9a8') + d.R(32, 228, 7, 7, '#e8d9a8');
+        const ax = 62, ay = 244, bx = 178, by = 44;
+        const len = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / len, uy = (by - ay) / len;
+        const nx = -uy * 22, ny = ux * 22;
+        const P = (t, o) => [ax + (bx - ax) * t + nx * o, ay + (by - ay) * t + ny * o];
+        const pts = (...ps) => ps.map((q) => q.map((v) => v.toFixed(1)).join(',')).join(' ');
+        s += d.P(pts(P(-0.2, -0.35), P(0.03, -0.35), P(0.03, 1.35), P(-0.2, 1.35)), '#4a3022');
+        const rust = '#6e4430';
+        for (let i = 0; i < 10; i++) {
+          const t = i / 10, u = (i + 1) / 10;
+          s += d.L(...P(t, 0), ...P(t, 1), rust, 2.4) + d.L(...P(t, i % 2 ? 0 : 1), ...P(u, i % 2 ? 1 : 0), rust, 2);
+        }
+        s += d.L(...P(0, 0), ...P(1, 0), '#5a3a28', 5) + d.L(...P(0, 1), ...P(1, 1), '#5a3a28', 5) + d.L(...P(1, 0), ...P(1, 1), '#5a3a28', 4);
+        s += d.C(...P(0, 0.5), 6, '#3a2418');
         return s;
       },
     },
     {
-      id: 'riverpoint', name: 'River Point', tier: 2, year: 2017, height: 730, floors: 52,
+      id: 'montgomeryward', photo: true, noShadow: true, name: 'Montgomery Ward Catalog House', tier: 3, year: 1908, floors: 8,
+      kind: '📦 Mail-order warehouse', architect: 'Schmidt, Garden & Martin',
+      spot: 'A very long, light-colored concrete building with stripes of windows that curves along the North Branch.',
+      facts: [
+        'Montgomery Ward sold everything from socks to whole kit houses by mail-order catalog – like the Amazon of its day.',
+        'Built in 1908, it was one of the biggest concrete buildings of its time.',
+        'It stretches nearly a quarter of a mile, following the curve of the river.',
+      ],
+      clues: [
+        'Before online shopping, orders from all over America were packed and shipped from inside me.',
+        "I'm a super long concrete building with stripes of windows that bends along the North Branch.",
+      ],
+      draw(d) {
+        let s = d.P('6,206 194,126 194,285 6,285', '#e6d6b2');
+        for (let k = 0; k < 8; k++) {
+          const yl = 210 + k * 9.4, yr = 133 + k * 18.6;
+          s += d.P(`6,${yl} 194,${yr} 194,${yr + 9} 6,${yl + 4.6}`, '#6b5f4f');
+        }
+        for (let x = 12; x < 194; x += 11) {
+          const top = 206 - ((x - 6) * 80) / 188;
+          s += d.L(x, top, x, 285, '#d7c39b', 1.6 + (x / 194) * 2);
+        }
+        s += d.P('6,206 194,126 194,133 6,210', '#cdb88e') + d.R(6, 272, 188, 13, '#bba67e');
+        return s;
+      },
+    },
+    {
+      id: 'salesforce', photo: true, name: 'Wolf Point Towers', aka: 'Salesforce Tower, Wolf Point East & Wolf Point West', tier: 3, year: 2023, height: 818, floors: 60,
+      architect: 'Pelli Clarke & Partners and bKL Architecture',
+      spot: 'Three glass towers on the spot where the river splits. The tallest, Salesforce Tower, is made of stacked blocks.',
+      facts: [
+        'Three towers stand here: Wolf Point West (2016), Wolf Point East (2020) and Salesforce Tower (2023), the tallest.',
+        'Wolf Point is where the river splits into its North and South Branches.',
+        "Some of Chicago's very first settlers built cabins and a tavern here in the 1820s.",
+      ],
+      clues: [
+        "We're three glass towers standing on the spot where the river splits in two.",
+        "We stand on land named after an animal that howls, where Chicago's first settlers lived.",
+      ],
+      draw(d) {
+        const g = () => d.lg([[0, '#6d8ea8'], [0.5, '#d3e4ef'], [1, '#6a8aa3']]);
+        let s = d.R(12, 96, 44, 189, g()) + d.V(12, 96, 44, 189, 4, 0.9, 'rgba(60,85,105,.45)') + d.R(12, 120, 44, 6, '#2b3e52');
+        s += d.R(150, 150, 40, 135, '#557590') + d.H(150, 150, 40, 135, 5, 0.9, 'rgba(220,235,245,.35)');
+        s += '<g transform="translate(100 285) scale(0.72 1) translate(-100 -285)">';
+        for (const [x, y, w, h] of [[64, 38, 66, 80], [57, 114, 82, 80], [50, 190, 96, 95]]) s += d.R(x, y, w, h, g(), 'rx="9"') + d.V(x + 3, y, w - 6, h, 4, 0.9, 'rgba(60,85,105,.45)');
+        s += d.R(60, 112, 74, 4, '#6fae63', 'rx="2"') + d.R(54, 188, 88, 4, '#6fae63', 'rx="2"') + '</g>';
+        return s;
+      },
+    },
+    {
+      id: 'riverpoint', photo: true, name: 'River Point', tier: 2, year: 2017, height: 730, floors: 52,
       architect: 'Pickard Chilton',       spot: 'A blue glass tower with a giant curved arch shape on its front and a park at its feet.',
       facts: [
         'It was built on top of busy railroad tracks – trains still run underneath!',
@@ -555,7 +668,7 @@
       },
     },
     {
-      id: 'riverside150', name: '150 North Riverside', tier: 2, year: 2017, height: 748, floors: 54,
+      id: 'riverside150', photo: true, name: '150 North Riverside', tier: 2, year: 2017, height: 748, floors: 54,
       architect: 'Goettsch Partners',       spot: 'A glass tower that balances on a super skinny base, like it\'s standing on tiptoes.',
       facts: [
         'Its site was squeezed between the river and train tracks, so it stands on a very skinny base.',
@@ -625,7 +738,7 @@
       },
     },
     {
-      id: 'opera', name: 'Civic Opera House', aka: '20 North Wacker', tier: 2, year: 1929, height: 555, floors: 45,
+      id: 'opera', photo: true, name: 'Civic Opera House', aka: '20 North Wacker', tier: 2, year: 1929, height: 555, floors: 45,
       architect: 'Graham, Anderson, Probst & White', nickname: "Insull's Throne",
       spot: 'A tall stone tower with two lower wings on each side – it looks like a giant throne chair.',
       facts: [
@@ -649,7 +762,7 @@
       },
     },
     {
-      id: 'dailynews', name: 'Riverside Plaza', aka: 'Chicago Daily News Building', tier: 3, year: 1929, height: 302, floors: 26,
+      id: 'dailynews', photo: true, name: 'Riverside Plaza', aka: 'Chicago Daily News Building', tier: 3, year: 1929, height: 302, floors: 26,
       architect: 'Holabird & Root',       spot: 'A stepped Art Deco stone building with a wide plaza and fountain right by the river.',
       facts: [
         'It was the first building in Chicago built over railroad tracks using "air rights."',
@@ -690,7 +803,7 @@
       },
     },
     {
-      id: 'willis', name: 'Willis Tower', aka: 'Sears Tower', tier: 1, year: 1973, height: 1451, floors: 110,
+      id: 'willis', photo: true, name: 'Willis Tower', aka: 'Sears Tower', tier: 1, year: 1973, height: 1451, floors: 110,
       architect: 'Bruce Graham & Fazlur Khan (SOM)',       spot: 'The tallest one! A black tower made of square tubes that step up, with two white antennas.',
       facts: [
         'It was the tallest building in the WORLD for about 25 years!',
@@ -711,7 +824,7 @@
       },
     },
     {
-      id: 'unionstation', noShadow: true, name: 'Union Station', tier: 3, year: 1925, height: 140, floors: 8,
+      id: 'unionstation', photo: true, noShadow: true, name: 'Union Station', tier: 3, year: 1925, height: 140, floors: 8,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A grand stone train station with a long row of giant columns along the river.',
       facts: [
         'Inside is the Great Hall, a huge room with a giant skylight.',
@@ -730,6 +843,28 @@
         for (let x = 20; x < 182; x += 11) s += d.R(x, 206, 5, 58, '#ece3cd');
         s += d.R(14, 262, 172, 23, st) + d.W(16, 266, 168, 16, st, { cw: 10, rh: 16, ww: 4, wh: 10, c: '#6f6a5e' });
         s += d.R(99.4, 128, 1.2, 20, '#777') + d.P('100.6,128 112,131 100.6,134', '#c0392b');
+        return s;
+      },
+    },
+    {
+      id: 'bmo', photo: true, name: 'BMO Tower', aka: '320 South Canal', tier: 3, year: 2022, height: 727, floors: 50,
+      architect: 'Goettsch Partners',
+      spot: 'A tall blue glass tower with a notch cut out of its top, right next to Union Station on the South Branch.',
+      facts: [
+        'It was finished in 2022 next to Union Station, on land that used to be a parking garage.',
+        'It is the Chicago headquarters of BMO, a bank from Canada (Bank of Montreal).',
+        'Look at its bottom: the glass slants in at an angle above the riverwalk.',
+      ],
+      clues: [
+        "I'm a shiny blue glass tower standing right next to Chicago's biggest train station.",
+        'A bank from Canada gave me my name, and it is only three letters long.',
+      ],
+      draw(d) {
+        const g = d.lg([[0, '#3d74b0'], [0.45, '#cfe6f8'], [1, '#376ba3']]);
+        let s = d.P('70,60 100,60 100,40 132,40 132,252 70,252', g);
+        s += d.V(70, 60, 30, 192, 4, 1, 'rgba(255,255,255,.35)') + d.V(100, 40, 32, 212, 4, 1, 'rgba(255,255,255,.35)');
+        s += d.R(70, 58, 30, 2, '#e8f3fb') + d.R(100, 38, 32, 2, '#e8f3fb');
+        s += d.P('70,252 132,252 122,285 80,285', '#4f7395') + d.V(80, 252, 42, 33, 5, 1, 'rgba(255,255,255,.3)');
         return s;
       },
     },
@@ -780,7 +915,29 @@
       },
     },
     {
-      id: 'postoffice', noShadow: true, name: 'The Old Post Office', tier: 2, year: 1932, height: 200, floors: 12,
+      id: 'wacker300s', photo: true, noShadow: true, name: '300 South Wacker Drive', kind: '🏢 Office tower', tier: 3,
+      spot: 'A dark rectangular tower with a light stripe down its middle covered by a giant map.',
+      facts: [
+        "A huge map of the Chicago River and the city's streets covers the middle of its dark tower.",
+        'It stands on the South Branch, at the corner of Wacker and Jackson Boulevard.',
+        'Can you find the river on its map? Look for the long wiggly line!',
+      ],
+      clues: [
+        'A giant map of the river and city streets runs down the middle of my dark tower.',
+        "I'm a dark tower with one light stripe, and that stripe is covered in map lines.",
+      ],
+      draw(d) {
+        let s = d.W(60, 70, 80, 215, '#25282d', { cw: 6, rh: 6, ww: 4.6, wh: 3.6, c: '#4d5561' });
+        s += d.R(87, 70, 26, 215, '#d9dcdf');
+        s += d.H(87, 74, 26, 211, 13, 0.9, '#a9aeb3') + d.V(87, 70, 26, 215, 9, 0.9, '#a9aeb3');
+        s += d.D('M97 70 C 104 110, 90 150, 103 190 S 96 250, 101 285', 'none', 'stroke="#5d9cc8" stroke-width="2.6"');
+        s += d.D('M103 190 C 108 200, 110 205, 113 208', 'none', 'stroke="#5d9cc8" stroke-width="2"');
+        s += d.C(105, 150, 2.6, '#d63a3a') + d.R(58, 66, 84, 5, '#1b1d21');
+        return s;
+      },
+    },
+    {
+      id: 'postoffice', photo: true, noShadow: true, name: 'The Old Post Office', tier: 2, year: 1932, height: 200, floors: 12,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A gigantic stone building on the South Branch with an expressway running right through it!',
       facts: [
         'The Eisenhower Expressway goes right THROUGH the building – cars drive under it every day!',
@@ -801,6 +958,27 @@
           s += d.D(`M${x - 18} 285 L${x - 18} 262 Q${x} 244 ${x + 18} 262 L${x + 18} 285 Z`, '#262626');
           s += d.R(x - 10, 277, 9, 5, cars[i], 'rx="1.5"') + d.R(x + 2, 278, 8, 4, cars[(i + 1) % 4], 'rx="1.5"');
         });
+        return s;
+      },
+    },
+    {
+      id: 'rivercity', photo: true, noShadow: true, name: 'River City', kind: '🏘️ Apartments & marina', tier: 3, year: 1986, architect: 'Bertrand Goldberg',
+      spot: 'A long, curving concrete building with rounded bays and its own boat marina, on the South Branch.',
+      facts: [
+        'It was designed by Bertrand Goldberg, the same architect as Marina City.',
+        'Its curvy shape follows the bend of the South Branch, and it has its own marina for boats.',
+        'Goldberg planned it as a little "city within a city," with homes, shops and an indoor street.',
+      ],
+      clues: [
+        "I'm a long, curvy concrete building that snakes along the South Branch, with my own boat marina.",
+        "The architect who designed the 'corncob' towers designed me too.",
+      ],
+      draw(d) {
+        let s = d.R(8, 172, 184, 113, '#d8d2c4');
+        for (let x = 12; x < 186; x += 22) s += d.R(x, 176, 17, 109, d.lg([[0, '#a39c90'], [0.5, '#f4efe5'], [1, '#a39c90']]), 'rx="8"');
+        s += d.H(8, 178, 184, 107, 7, 1.3, 'rgba(80,70,60,.45)');
+        for (const [x, y, w, h] of [[26, 160, 26, 14], [86, 154, 32, 20], [148, 160, 26, 14]]) s += d.R(x, y, w, h, '#cfc8b9', 'rx="7"');
+        for (const x of [30, 70, 120, 160]) s += d.P(`${x},280 ${x + 16},280 ${x + 13},284 ${x + 3},284`, '#fff');
         return s;
       },
     },

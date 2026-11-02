@@ -10,8 +10,11 @@ test('every building has complete, unique data', () => {
     assert.match(b.id, /^[a-z0-9]{2,20}$/, b.id);
     assert.ok(!ids.has(b.id), 'duplicate id ' + b.id);
     ids.add(b.id);
-    for (const k of ['name', 'architect', 'spot']) assert.ok(typeof b[k] === 'string' && b[k].length > 2, `${b.id}.${k}`);
-    for (const k of ['year', 'height', 'floors']) assert.ok(Number.isFinite(b[k]) && b[k] > 0, `${b.id}.${k}`);
+    for (const k of ['name', 'spot']) assert.ok(typeof b[k] === 'string' && b[k].length > 2, `${b.id}.${k}`);
+    // year, height, floors and architect are optional (bridges, the Riverwalk, or facts we couldn't confirm)
+    for (const k of ['year', 'height', 'floors']) if (b[k] != null) assert.ok(Number.isFinite(b[k]) && b[k] > 0, `${b.id}.${k}`);
+    if (b.architect != null) assert.ok(typeof b.architect === 'string' && b.architect.length > 2, `${b.id}.architect`);
+    assert.ok(b.kind || b.height > 0, `${b.id} needs a height or a kind (like a bridge)`);
     assert.ok([1, 2, 3].includes(b.tier), `${b.id}.tier`);
     assert.ok(b.facts.length >= 2 && b.clues.length >= 2, `${b.id} facts/clues`);
   }
@@ -21,7 +24,7 @@ test('every building has complete, unique data', () => {
 test('clues never give away the answer', () => {
   for (const b of BUILDINGS) {
     const words = [b.name, b.aka].filter(Boolean).flatMap((n) => n.toLowerCase().split(/[^a-z0-9]+/))
-      .filter((w) => w.length > 3 && !['tower', 'building', 'plaza', 'north', 'south', 'east', 'west', 'chicago', 'center', 'international', 'hotel', 'river'].includes(w));
+      .filter((w) => w.length > 3 && !['tower', 'building', 'plaza', 'north', 'south', 'east', 'west', 'chicago', 'center', 'international', 'hotel', 'river', 'towers'].includes(w));
     for (const c of b.clues) for (const w of words) assert.ok(!c.toLowerCase().includes(w), `${b.id} clue mentions "${w}": ${c}`);
   }
 });

@@ -2,6 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { createServer } = require('../local/server.js');
 const { createFileStore } = require('../lib/storage.js');
+const { BUILDINGS } = require('../public/js/buildings.js');
+const { WIKI } = require('../public/js/photo-sources.js');
 
 // A fake Wikimedia (Wikipedia API, Commons API and image server) in the real response formats.
 function fakeWikimedia() {
@@ -69,7 +71,7 @@ test('serves building photos from our own site, with credits', async (t) => {
   const r = await req('GET', '/api/photos');
   assert.strictEqual(r.status, 200);
   const photos = r.data.photos;
-  assert.strictEqual(Object.keys(photos).length, 34, 'every building has a photo');
+  assert.strictEqual(Object.keys(photos).length, BUILDINGS.length, 'every building has a photo');
   // no article photo → Commons search, skipping the inside shot
   assert.strictEqual(photos.aqua.file, 'Aqua Tower Chicago 2.jpg');
   // flagged buildings use the outside-view search instead of the article photo
@@ -110,7 +112,7 @@ test('teachers can search for and pick a better photo', async (t) => {
 
   let photos = (await req('GET', '/api/photos')).data.photos;
   assert.strictEqual(photos.aqua.file, 'Aqua Tower Chicago 2.jpg');
-  assert.ok(!photos.willis, 'willis now uses the drawing');
+  assert.strictEqual(photos.willis.none, true, 'willis now uses the drawing');
   const admin = await req('GET', '/api/admin/photos', null, true);
   assert.strictEqual(admin.data.photos.aqua.chosenBy, 'teacher');
 
@@ -122,5 +124,15 @@ test('teachers can search for and pick a better photo', async (t) => {
 test('a crowd of iPads opening at once shares one Wikimedia lookup', async (t) => {
   const { req, calls } = await boot(t);
   await Promise.all(Array.from({ length: 30 }, () => req('GET', '/api/photos')));
-  assert.strictEqual(calls.wp, 1, 'one batched Wikipedia request, not 30');
+  // Wikipedia takes up to 45 titles per request, so one lookup is a few batched requests, not 30 lookups
+  const batches = Math.ceil(new Set(Object.values(WIKI).flat()).size / 45);
+  assert.strictEqual(calls.wp, batches, 'one shared lookup, not 30');
+});
+
+test('the game is told when a teacher wants the drawing instead of any photo', async (t) => {
+  const { req } = await boot(t);
+  await req('PUT', '/api/admin/photos/wrigley', { file: 'none' }, true);
+  const photos = (await req('GET', '/api/photos')).data.photos;
+  assert.deepStrictEqual(photos.wrigley, { none: true, chosenBy: 'teacher' });
+  assert.strictEqual(photos.tribune.chosenBy, 'auto');
 });

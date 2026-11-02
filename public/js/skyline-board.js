@@ -4,7 +4,8 @@
  * Used by the game's Leaderboard screen and the classroom display (skyline.html). */
 (function (root) {
   const GROUND = 285; // ground line inside every building drawing
-  const TALLEST = BUILDINGS.slice().sort((a, b) => b.height - a.height);
+  // only real towers with a known height can be skyline spots (not bridges or the Riverwalk)
+  const TALLEST = BUILDINGS.filter((b) => b.height > 0).sort((a, b) => b.height - a.height);
   const bboxCache = {};
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = (n) => Math.round(n).toLocaleString('en-US');

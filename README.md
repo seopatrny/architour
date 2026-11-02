@@ -41,6 +41,22 @@ Built for 2–5 minute sessions during breaks and passing periods: tap to play, 
 
 To check it worked, open `https://<your-site>/api/health`. It should say `"ok":true` and `"storage":"upstash"`. If it says `"ok":false`, the message explains what's missing, and the game shows an orange **"Offline mode"** banner until it's fixed.
 
+## Testing changes before they go live
+
+The `main` branch is the live game. Every other branch gets its own private **preview** link from Vercel, so you can try changes without students seeing them.
+
+**One-time setup**
+1. **GitHub:** create a `main` branch from the current live version and make it the default branch (repo **Settings → General → Default branch**).
+2. **Vercel:** set the production branch to `main` (**Settings → Environments → Production → Branch Tracking**, or **Settings → Git** on older dashboards).
+3. **Test data:** connect your existing Upstash database to **Preview** as well as Production (in Vercel: **Storage →** your database **→ Projects** / settings). No second database is needed: preview deployments automatically keep their players, scores and photo picks in a separate section of the database (`skyq-preview`), so test scores never show up on the real leaderboard. *(Optional: set a `DATA_NAMESPACE` environment variable to choose a different section name.)*
+4. **Admin key for previews:** in **Settings → Environment Variables**, make sure `ADMIN_KEY` is also set for **Preview**.
+
+**Every update**
+1. Changes are pushed to a branch other than `main`. Vercel builds a preview and lists it under **Deployments** (marked *Preview*). The link also appears next to the commit on GitHub.
+2. Preview pages show a purple **🧪 TEST VERSION** strip at the bottom, so they're never confused with the real game. Their leaderboard starts empty, separate from the real one. To test on an iPad that isn't logged in to Vercel, use the deployment's **Share** button to get a link.
+3. Happy with it? Merge the branch into `main` (a pull request), and Vercel updates the live game.
+4. Something wrong after a release? In **Deployments**, pick the previous production deployment and choose **Instant Rollback**.
+
 ## Or run it on a school computer
 
 You need [Node.js](https://nodejs.org) 18 or newer. There are no packages to install. Players and scores are saved to a file.
@@ -69,6 +85,10 @@ If the iPads can't reach the server, the game still works and an orange banner s
 3. Set **Auto-Lock** to *Never* (or a long time) if the iPads stay plugged in.
 4. Turn the volume to a hallway-friendly level, or tap 🔊 in the game to mute it.
 
+## Building Dex for teachers
+
+Open **`/dex.html`** (or **Open the Building Dex** on the teacher page) to see every building fully unlocked: photo, year, height, architect, "how to spot it" tip, fun facts and the quiz clues the game uses. Search by any word, filter by level (Rookie / Pro / Legend), or press **🖨️ Print** for a study sheet.
+
 ## Classroom screen: Skyline Champions
 
 Open **`/skyline.html`** on a projector or TV (there's also a button on the teacher page). It's a full-screen, live version of the Skyline Leaderboard for the classroom:
@@ -95,8 +115,9 @@ Go to `/admin.html` and enter your `ADMIN_KEY`. From there you can:
 All building data lives in [`public/js/buildings.js`](public/js/buildings.js): names, years, heights, architects, facts, clues and the drawings.
 
 - **Facts:** written for kids and checked against common sources. Please review them before a big contest and fix anything your class learns differently on the actual tour.
-- **Photos:** each building shows a real photo, by default the main photo from its Wikipedia article, but only if it's freely licensed on Wikimedia Commons. The server fetches each photo and serves it from your own site. Vercel's CDN caches it, so Wikimedia gets one request per photo instead of one per iPad, and school web filters don't block photos. Photos are shown whole, never cropped. The photographer and license appear on each building card and on the **📷 Photo credits** screen (bottom-right of the title screen), as the free licenses require.
-  - **Fix a bad photo:** on the teacher page (`/admin.html`), use **Building photos**. Click **Change photo** on any building to see choices from Wikimedia Commons (search with your own words if needed) and click the one you want. You can also pick **Use the drawing**, or go back to **Use automatic photo**. Every iPad switches within a minute or two.
+- **Class photo sheet:** 26 buildings use the photos from the teacher's river tour photo sheet, saved in `public/img/buildings/<id>.jpg`. To swap one, replace its file with another JPEG of the same name.
+- **Photos:** buildings without a class photo show a real photo, by default the main photo from its Wikipedia article, but only if it's freely licensed on Wikimedia Commons. The server fetches each photo and serves it from your own site. Vercel's CDN caches it, so Wikimedia gets one request per photo instead of one per iPad, and school web filters don't block photos. Photos are shown whole, never cropped. The photographer and license appear on each building card and on the **📷 Photo credits** screen (bottom-right of the title screen), as the free licenses require.
+  - **Fix a bad photo:** on the teacher page (`/admin.html`), use **Building photos**. Click **Change photo** on any building (including class-photo-sheet ones) to see choices from Wikimedia Commons (search with your own words if needed) and click the one you want. You can also pick **Use the drawing**, or go back to **Use automatic photo**. Every iPad switches within a minute or two.
   - **Your own photo:** save it as `public/img/buildings/<id>.jpg` (for example `willis.jpg`) and add `photo: true` to that building in `buildings.js`.
   - **Fallbacks:** if a photo can't load, that building uses its cartoon drawing. Mystery Shadow questions always use the drawings, because a silhouette needs a clean outline.
 - **Difficulty:** each building has a `tier` (1 = Rookie, 2 = Pro, 3 = Legend). Classic Tour and Survival start with tier 1 and add harder buildings as the game goes on.

@@ -59,6 +59,12 @@
     <p class="msg">Keyboard: <b>F</b> full screen · <b>1</b> Today · <b>2</b> This Week · <b>3</b> All-Time. Move the mouse to show the controls.</p>
   </div>
 
+  <div class="card">
+    <h2>📚 Building Dex (teacher guide)</h2>
+    <p class="msg" style="color:var(--ink)">Every building in the game, fully unlocked: photos, facts, "how to spot it" tips and the quiz clues. Search it, filter by level, or print it as a study sheet.</p>
+    <div class="row"><a href="dex.html" target="_blank"><button>Open the Building Dex</button></a></div>
+  </div>
+
   <div class="card" id="loginCard">
     <h2>Sign in</h2>
     <form class="row" id="loginForm">
@@ -109,6 +115,7 @@
   </div>
 </main>
 <script src="js/buildings.js"></script>
+<script src="js/env-badge.js"></script>
 <script>
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -151,10 +158,13 @@
     }
     $('#photos').innerHTML = BUILDINGS.map((b) => {
       const p = photoMap[b.id], drawing = overrides[b.id] && overrides[b.id].file === 'none';
-      const tag = drawing ? '<span class="tag none">Using drawing</span>' : !p ? '<span class="tag none">No photo found</span>'
-        : p.chosenBy === 'teacher' ? '<span class="tag teacher">Picked by you</span>' : '<span class="tag">Automatic</span>';
-      const img = p ? `style="background-image:url('${esc(p.thumb)}')"` : '';
-      return `<div class="ph"><div class="img" ${img}>${p ? '' : 'drawing'}</div><div class="meta"><b>${esc(b.name)}</b>${tag}
+      const picked = p && p.chosenBy === 'teacher';
+      const own = !picked && !drawing && b.photo; // photo from the class photo sheet
+      const tag = picked ? '<span class="tag teacher">Picked by you</span>' : own ? '<span class="tag teacher">Class photo sheet</span>'
+        : drawing ? '<span class="tag none">Using drawing</span>' : !p ? '<span class="tag none">No photo found</span>' : '<span class="tag">Automatic</span>';
+      const url = picked ? p.thumb : own ? `img/buildings/${b.id}.jpg` : p && !drawing ? p.thumb : '';
+      const img = url ? `style="background-image:url('${esc(url)}')"` : '';
+      return `<div class="ph"><div class="img" ${img}>${url ? '' : 'drawing'}</div><div class="meta"><b>${esc(b.name)}</b>${tag}
         <button data-pick="${b.id}">Change photo</button></div></div>`;
     }).join('');
   }
