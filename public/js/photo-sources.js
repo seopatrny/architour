@@ -25,7 +25,7 @@
     leoburnett: ['Leo Burnett Building'],
     wacker333: ['333 Wacker Drive'],
     mart: ['Merchandise Mart'],
-    salesforce: ['Salesforce Tower Chicago', 'Wolf Point (Chicago)'],
+    salesforce: ['Wolf Point (Chicago)', 'Salesforce Tower Chicago'],
     riverpoint: ['River Point'],
     riverside150: ['150 North Riverside'],
     bofa110: ['110 North Wacker'],
@@ -38,6 +38,13 @@
     franklin: ['Franklin Center (Chicago)'],
     wacker311: ['311 South Wacker Drive'],
     postoffice: ['Old Chicago Main Post Office', 'Old Post Office (Chicago)'],
+    riverwalk: ['Chicago Riverwalk'],
+    lasalle300: ['300 North LaSalle'],
+    kinzie: ['Kinzie Street railroad bridge', 'Kinzie Street Bridge'],
+    montgomeryward: ['Montgomery Ward Company Complex', 'Montgomery Ward & Co. Catalog House'],
+    bmo: ['BMO Tower (Chicago)', '320 South Canal'],
+    wacker300s: ['300 South Wacker Drive'],
+    rivercity: ['River City (Chicago)'],
   };
 
   // Search words for Wikimedia Commons, used when an article's main photo is missing or is an
@@ -48,6 +55,10 @@
     unionstation: 'Chicago Union Station exterior Canal Street',
     amaplaza: '330 North Wabash AMA Plaza Chicago',
     riverside150: '150 North Riverside Chicago',
+    wacker300s: '300 South Wacker Drive Chicago',
+    bmo: 'BMO Tower Chicago 320 South Canal',
+    montgomeryward: 'Montgomery Ward Catalog House Chicago river',
+    rivercity: 'River City Chicago Goldberg',
   };
   const PREFER_SEARCH = ['aqua', 'opera', 'unionstation', 'amaplaza', 'riverside150'];
 

@@ -731,11 +731,12 @@
           ${b.aka ? `<div class="aka">also called <b>${esc(b.aka)}</b></div>` : ''}
           ${b.nickname ? `<div class="aka">nickname: <b>${esc(b.nickname)}</b></div>` : ''}
           <div class="chips">
-            <span class="chip">📅 ${b.year}</span>
-            <span class="chip">📏 ${fmt(b.height)} ft</span>
-            <span class="chip">🏢 ${b.floors} floors</span>
+            ${b.kind ? `<span class="chip">${esc(b.kind)}</span>` : ''}
+            ${b.year ? `<span class="chip">📅 ${b.year}</span>` : ''}
+            ${b.height ? `<span class="chip">📏 ${fmt(b.height)} ft</span>` : ''}
+            ${b.floors ? `<span class="chip">🏢 ${b.floors} floors</span>` : ''}
           </div>
-          <div class="chip wide">✏️ ${esc(b.architect)}</div>
+          ${b.architect ? `<div class="chip wide">✏️ ${esc(b.architect)}</div>` : ''}
           <div class="spot"><b>👀 How to spot it:</b> ${esc(b.spot)}</div>
           <ul class="facts">${b.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
           <div class="mastery">Mastery: ${stars(Math.min(MASTERED, m))} ${m >= MASTERED ? '<b class="gold-txt">MASTERED!</b>' : `<small>${MASTERED - m} more to master</small>`}</div>
