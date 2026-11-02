@@ -137,7 +137,7 @@
 
   // download photos one at a time so we never fire dozens of requests at once
   async function preload(map) {
-    for (const p of Object.values(map)) {
+    for (const p of Object.values(map).filter((x) => x.src)) {
       await new Promise((done) => { const img = new Image(); img.onload = img.onerror = done; img.src = p.src; });
     }
   }

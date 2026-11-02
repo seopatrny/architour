@@ -158,10 +158,13 @@
     }
     $('#photos').innerHTML = BUILDINGS.map((b) => {
       const p = photoMap[b.id], drawing = overrides[b.id] && overrides[b.id].file === 'none';
-      const tag = drawing ? '<span class="tag none">Using drawing</span>' : !p ? '<span class="tag none">No photo found</span>'
-        : p.chosenBy === 'teacher' ? '<span class="tag teacher">Picked by you</span>' : '<span class="tag">Automatic</span>';
-      const img = p ? `style="background-image:url('${esc(p.thumb)}')"` : '';
-      return `<div class="ph"><div class="img" ${img}>${p ? '' : 'drawing'}</div><div class="meta"><b>${esc(b.name)}</b>${tag}
+      const picked = p && p.chosenBy === 'teacher';
+      const own = !picked && !drawing && b.photo; // photo from the class photo sheet
+      const tag = picked ? '<span class="tag teacher">Picked by you</span>' : own ? '<span class="tag teacher">Class photo sheet</span>'
+        : drawing ? '<span class="tag none">Using drawing</span>' : !p ? '<span class="tag none">No photo found</span>' : '<span class="tag">Automatic</span>';
+      const url = picked ? p.thumb : own ? `img/buildings/${b.id}.jpg` : p && !drawing ? p.thumb : '';
+      const img = url ? `style="background-image:url('${esc(url)}')"` : '';
+      return `<div class="ph"><div class="img" ${img}>${url ? '' : 'drawing'}</div><div class="meta"><b>${esc(b.name)}</b>${tag}
         <button data-pick="${b.id}">Change photo</button></div></div>`;
     }).join('');
   }

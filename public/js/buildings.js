@@ -2,8 +2,9 @@
  *
  * tier 1 = Rookie (the superstars), 2 = Pro, 3 = Legend.
  * clues never say the building's name – they power the "Clue Detective" questions.
- * photo (optional): put a picture at public/img/buildings/<id>.jpg and set photo: true
- * to show the real photo instead of the illustration.
+ * photo: true means the building has its own picture at public/img/buildings/<id>.jpg
+ * (these came from the teacher's river tour photo sheet). Buildings without one use a
+ * Wikimedia Commons photo. A photo picked on the teacher page beats both.
  *
  * Every drawing uses a 200 x 300 box with the ground at y = 285. */
 (function (root) {
@@ -36,7 +37,7 @@
       },
     },
     {
-      id: 'aqua', name: 'Aqua Tower', tier: 1, year: 2009, height: 859, floors: 82,
+      id: 'aqua', photo: true, name: 'Aqua Tower', tier: 1, year: 2009, height: 859, floors: 82,
       architect: 'Jeanne Gang (Studio Gang)',       spot: 'Look for white balconies that ripple up the tower like waves on water.',
       facts: [
         'Its wavy concrete balconies are all different shapes – no two floors are the same.',
@@ -60,7 +61,7 @@
       },
     },
     {
-      id: 'stregis', name: 'St. Regis Chicago', aka: 'Vista Tower', tier: 1, year: 2020, height: 1191, floors: 101,
+      id: 'stregis', photo: true, name: 'St. Regis Chicago', aka: 'Vista Tower', tier: 1, year: 2020, height: 1191, floors: 101,
       architect: 'Jeanne Gang (Studio Gang)',       spot: 'Three blue-green glass towers of different heights, stacked like wobbly blocks.',
       facts: [
         "It's the 3rd-tallest building in Chicago.",
@@ -92,7 +93,7 @@
       },
     },
     {
-      id: 'nbc', name: 'NBC Tower', tier: 2, year: 1989, height: 627, floors: 40,
+      id: 'nbc', photo: true, name: 'NBC Tower', tier: 2, year: 1989, height: 627, floors: 40,
       architect: 'Adrian Smith (SOM)',       spot: 'A cream-colored stone tower that steps in like a wedding cake, topped by a needle.',
       facts: [
         'It was built in 1989 but designed to look like a 1930s Art Deco skyscraper.',
@@ -113,7 +114,7 @@
       },
     },
     {
-      id: 'riverwalk', noShadow: true, name: 'Chicago Riverwalk', kind: '🚶 Riverside path', tier: 2, year: 2016,
+      id: 'riverwalk', photo: true, noShadow: true, name: 'Chicago Riverwalk', kind: '🚶 Riverside path', tier: 2, year: 2016,
       architect: 'Sasaki and Ross Barney Architects',
       spot: 'A long stone path with wide steps down to the water along the Main Branch, full of people, cafés and kayaks.',
       facts: [
@@ -231,7 +232,7 @@
       },
     },
     {
-      id: 'tribune', name: 'Tribune Tower', tier: 1, year: 1925, height: 462, floors: 36,
+      id: 'tribune', photo: true, name: 'Tribune Tower', tier: 1, year: 1925, height: 462, floors: 36,
       architect: 'John Mead Howells & Raymond Hood',       spot: 'A cream stone tower with a crown of flying buttresses, like a castle or cathedral.',
       facts: [
         'Its design won a worldwide contest in 1922 with more than 260 entries.',
@@ -256,7 +257,7 @@
       },
     },
     {
-      id: 'wrigley', name: 'Wrigley Building', tier: 1, year: 1924, height: 425, floors: 30,
+      id: 'wrigley', photo: true, name: 'Wrigley Building', tier: 1, year: 1924, height: 425, floors: 30,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A gleaming white building with a big clock tower right by the Michigan Avenue bridge.',
       facts: [
         'Its clock tower was inspired by the Giralda tower in Seville, Spain.',
@@ -374,7 +375,7 @@
       },
     },
     {
-      id: 'trump', name: 'Trump International Hotel & Tower', tier: 1, year: 2009, height: 1388, floors: 98,
+      id: 'trump', photo: true, name: 'Trump International Hotel & Tower', tier: 1, year: 2009, height: 1388, floors: 98,
       architect: 'Adrian Smith (SOM)',       spot: 'A shiny silver-blue glass tower with three step-backs and a tall spire.',
       facts: [
         "Its step-backs line up with the heights of its neighbors, like the Wrigley Building's top.",
@@ -395,7 +396,7 @@
       },
     },
     {
-      id: 'amaplaza', noShadow: true, name: 'AMA Plaza', aka: 'IBM Building (330 North Wabash)', tier: 2, year: 1973, height: 695, floors: 52,
+      id: 'amaplaza', photo: true, noShadow: true, name: 'AMA Plaza', aka: 'IBM Building (330 North Wabash)', tier: 2, year: 1973, height: 695, floors: 52,
       architect: 'Ludwig Mies van der Rohe',       spot: 'A plain, dark black box with a neat grid of bronze windows – no decorations at all.',
       facts: [
         'It was the last American office building designed by the famous architect Mies van der Rohe.',
@@ -414,7 +415,7 @@
       },
     },
     {
-      id: 'marina', name: 'Marina City', tier: 1, year: 1964, height: 587, floors: 65,
+      id: 'marina', photo: true, name: 'Marina City', tier: 1, year: 1964, height: 587, floors: 65,
       architect: 'Bertrand Goldberg', nickname: 'The Corncobs',
       spot: 'Two round towers that look exactly like corncobs, with parking on the bottom floors.',
       facts: [
@@ -453,7 +454,7 @@
       },
     },
     {
-      id: 'reidmurdoch', name: 'Reid Murdoch Building', tier: 3, year: 1914, height: 120, floors: 8,
+      id: 'reidmurdoch', photo: true, name: 'Reid Murdoch Building', tier: 3, year: 1914, height: 120, floors: 8,
       architect: 'George C. Nimmons',       spot: 'A long, low red-brick building with a clock tower, right on the river bank.',
       facts: [
         'It was a giant grocery warehouse – boats unloaded food right at its river doors.',
@@ -475,7 +476,7 @@
       },
     },
     {
-      id: 'lasalle300', name: '300 North LaSalle', tier: 3, year: 2009, height: 785, floors: 60,
+      id: 'lasalle300', photo: true, name: '300 North LaSalle', tier: 3, year: 2009, height: 785, floors: 60,
       architect: 'Pickard Chilton',
       spot: 'A tall silvery-blue glass tower with a stepped top, right on the river at LaSalle Street.',
       facts: [
@@ -519,7 +520,7 @@
       },
     },
     {
-      id: 'wacker333', noShadow: true, name: '333 Wacker Drive', tier: 2, year: 1983, height: 487, floors: 36,
+      id: 'wacker333', photo: true, noShadow: true, name: '333 Wacker Drive', tier: 2, year: 1983, height: 487, floors: 36,
       architect: 'Kohn Pedersen Fox',       spot: 'A curvy green glass building that bends right along the bend in the river.',
       facts: [
         'Its curved green glass follows the bend in the river exactly – it mirrors the water!',
@@ -541,7 +542,7 @@
       },
     },
     {
-      id: 'mart', name: 'Merchandise Mart', tier: 1, year: 1930, height: 343, floors: 25,
+      id: 'mart', photo: true, name: 'Merchandise Mart', tier: 1, year: 1930, height: 343, floors: 25,
       architect: 'Graham, Anderson, Probst & White', nickname: 'theMART',
       spot: 'A HUGE, wide tan building that stretches along the river for two whole blocks.',
       facts: [
@@ -565,7 +566,7 @@
       },
     },
     {
-      id: 'kinzie', name: 'Kinzie Street Railroad Bridge', kind: '🌉 Drawbridge', tier: 2, year: 1908,
+      id: 'kinzie', photo: true, name: 'Kinzie Street Railroad Bridge', kind: '🌉 Drawbridge', tier: 2, year: 1908,
       spot: 'A huge rusty-brown steel bridge stuck pointing up at the sky, on the North Branch near the Merchandise Mart.',
       facts: [
         'When it was built in 1908, it was the longest and heaviest bascule (drawbridge) span in the world.',
@@ -596,7 +597,7 @@
       },
     },
     {
-      id: 'montgomeryward', noShadow: true, name: 'Montgomery Ward Catalog House', tier: 3, year: 1908, floors: 8,
+      id: 'montgomeryward', photo: true, noShadow: true, name: 'Montgomery Ward Catalog House', tier: 3, year: 1908, floors: 8,
       kind: '📦 Mail-order warehouse', architect: 'Schmidt, Garden & Martin',
       spot: 'A very long, light-colored concrete building with stripes of windows that curves along the North Branch.',
       facts: [
@@ -623,7 +624,7 @@
       },
     },
     {
-      id: 'salesforce', name: 'Wolf Point Towers', aka: 'Salesforce Tower, Wolf Point East & Wolf Point West', tier: 3, year: 2023, height: 818, floors: 60,
+      id: 'salesforce', photo: true, name: 'Wolf Point Towers', aka: 'Salesforce Tower, Wolf Point East & Wolf Point West', tier: 3, year: 2023, height: 818, floors: 60,
       architect: 'Pelli Clarke & Partners and bKL Architecture',
       spot: 'Three glass towers on the spot where the river splits. The tallest, Salesforce Tower, is made of stacked blocks.',
       facts: [
@@ -646,7 +647,7 @@
       },
     },
     {
-      id: 'riverpoint', name: 'River Point', tier: 2, year: 2017, height: 730, floors: 52,
+      id: 'riverpoint', photo: true, name: 'River Point', tier: 2, year: 2017, height: 730, floors: 52,
       architect: 'Pickard Chilton',       spot: 'A blue glass tower with a giant curved arch shape on its front and a park at its feet.',
       facts: [
         'It was built on top of busy railroad tracks – trains still run underneath!',
@@ -667,7 +668,7 @@
       },
     },
     {
-      id: 'riverside150', name: '150 North Riverside', tier: 2, year: 2017, height: 748, floors: 54,
+      id: 'riverside150', photo: true, name: '150 North Riverside', tier: 2, year: 2017, height: 748, floors: 54,
       architect: 'Goettsch Partners',       spot: 'A glass tower that balances on a super skinny base, like it\'s standing on tiptoes.',
       facts: [
         'Its site was squeezed between the river and train tracks, so it stands on a very skinny base.',
@@ -737,7 +738,7 @@
       },
     },
     {
-      id: 'opera', name: 'Civic Opera House', aka: '20 North Wacker', tier: 2, year: 1929, height: 555, floors: 45,
+      id: 'opera', photo: true, name: 'Civic Opera House', aka: '20 North Wacker', tier: 2, year: 1929, height: 555, floors: 45,
       architect: 'Graham, Anderson, Probst & White', nickname: "Insull's Throne",
       spot: 'A tall stone tower with two lower wings on each side – it looks like a giant throne chair.',
       facts: [
@@ -761,7 +762,7 @@
       },
     },
     {
-      id: 'dailynews', name: 'Riverside Plaza', aka: 'Chicago Daily News Building', tier: 3, year: 1929, height: 302, floors: 26,
+      id: 'dailynews', photo: true, name: 'Riverside Plaza', aka: 'Chicago Daily News Building', tier: 3, year: 1929, height: 302, floors: 26,
       architect: 'Holabird & Root',       spot: 'A stepped Art Deco stone building with a wide plaza and fountain right by the river.',
       facts: [
         'It was the first building in Chicago built over railroad tracks using "air rights."',
@@ -802,7 +803,7 @@
       },
     },
     {
-      id: 'willis', name: 'Willis Tower', aka: 'Sears Tower', tier: 1, year: 1973, height: 1451, floors: 110,
+      id: 'willis', photo: true, name: 'Willis Tower', aka: 'Sears Tower', tier: 1, year: 1973, height: 1451, floors: 110,
       architect: 'Bruce Graham & Fazlur Khan (SOM)',       spot: 'The tallest one! A black tower made of square tubes that step up, with two white antennas.',
       facts: [
         'It was the tallest building in the WORLD for about 25 years!',
@@ -823,7 +824,7 @@
       },
     },
     {
-      id: 'unionstation', noShadow: true, name: 'Union Station', tier: 3, year: 1925, height: 140, floors: 8,
+      id: 'unionstation', photo: true, noShadow: true, name: 'Union Station', tier: 3, year: 1925, height: 140, floors: 8,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A grand stone train station with a long row of giant columns along the river.',
       facts: [
         'Inside is the Great Hall, a huge room with a giant skylight.',
@@ -846,7 +847,7 @@
       },
     },
     {
-      id: 'bmo', name: 'BMO Tower', aka: '320 South Canal', tier: 3, year: 2022, height: 727, floors: 50,
+      id: 'bmo', photo: true, name: 'BMO Tower', aka: '320 South Canal', tier: 3, year: 2022, height: 727, floors: 50,
       architect: 'Goettsch Partners',
       spot: 'A tall blue glass tower with a notch cut out of its top, right next to Union Station on the South Branch.',
       facts: [
@@ -914,7 +915,7 @@
       },
     },
     {
-      id: 'wacker300s', noShadow: true, name: '300 South Wacker Drive', kind: '🏢 Office tower', tier: 3,
+      id: 'wacker300s', photo: true, noShadow: true, name: '300 South Wacker Drive', kind: '🏢 Office tower', tier: 3,
       spot: 'A dark rectangular tower with a light stripe down its middle covered by a giant map.',
       facts: [
         "A huge map of the Chicago River and the city's streets covers the middle of its dark tower.",
@@ -936,7 +937,7 @@
       },
     },
     {
-      id: 'postoffice', noShadow: true, name: 'The Old Post Office', tier: 2, year: 1932, height: 200, floors: 12,
+      id: 'postoffice', photo: true, noShadow: true, name: 'The Old Post Office', tier: 2, year: 1932, height: 200, floors: 12,
       architect: 'Graham, Anderson, Probst & White',       spot: 'A gigantic stone building on the South Branch with an expressway running right through it!',
       facts: [
         'The Eisenhower Expressway goes right THROUGH the building – cars drive under it every day!',
@@ -961,7 +962,7 @@
       },
     },
     {
-      id: 'rivercity', noShadow: true, name: 'River City', kind: '🏘️ Apartments & marina', tier: 3, year: 1986, architect: 'Bertrand Goldberg',
+      id: 'rivercity', photo: true, noShadow: true, name: 'River City', kind: '🏘️ Apartments & marina', tier: 3, year: 1986, architect: 'Bertrand Goldberg',
       spot: 'A long, curving concrete building with rounded bays and its own boat marina, on the South Branch.',
       facts: [
         'It was designed by Bertrand Goldberg, the same architect as Marina City.',
